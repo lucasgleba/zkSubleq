@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "circomlib": "^2.0.2",
+    "fixed-merkle-tree": "^0.6.0",
+    "websnark": "^0.0.5"
+  }
+}
