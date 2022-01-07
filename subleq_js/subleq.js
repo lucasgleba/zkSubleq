@@ -22,6 +22,16 @@ function toMemory(code, data) {
   });
 }
 
+function genMTree(code, data) {
+  memory = toMemory(code, data);
+  return new MerkleTree(MEMORY_DEPTH, memory);
+}
+
+function genSTree(pc, mTree) {
+  pc = toPc(pc);
+  return new MerkleTree(1, [pc, mTree.root()]);
+}
+
 function subleq(pc, mTree) {
   const insStartIndex = pc.toJSNumber() * INSTRUCTION_SIZE;
   const bIndex = insStartIndex + 1;
@@ -98,32 +108,15 @@ function step(sTree, mTree) {
   });
 }
 
-function main() {
-  const rawPc = 1;
-  const pc = toPc(rawPc);
-
-  const codeLen = 2; // instructions
-  const codeOffset = codeLen * INSTRUCTION_SIZE;
-  const code = new Array(codeOffset).fill(0);
-  const pcInsStartIndex = rawPc * INSTRUCTION_SIZE;
-
-  code[pcInsStartIndex + 0] = codeOffset + 0; // addrA
-  code[pcInsStartIndex + 1] = codeOffset + 1; // addrB
-  code[pcInsStartIndex + 2] = 0; // C
-
-  const data = [10, 1]; // mA, mB
-  const memory = toMemory(code, data);
-  const mTree = new MerkleTree(MEMORY_DEPTH, memory);
-  const sTree = new MerkleTree(1, [pc, mTree.root()]);
-
-  return step(sTree, mTree);
-}
-
-const filename = "sample";
-const fs = require("fs");
-const data = main();
-const dataStr = JSON.stringify(data, null, 4);
-fs.writeFile(filename + ".json", dataStr, function (err, result) {
-  if (err) console.log("error", err);
-});
-console.log(dataStr, `> ${filename}.json`);
+module.exports = {
+  constants: {
+    MEMORY_DEPTH,
+    INSTRUCTION_SIZE,
+    MEMORY_SLOT_SIZE,
+    TWO_POW_M_SLOT_SIZE,
+  },
+  genMTree,
+  genSTree,
+  subleq,
+  step,
+};
