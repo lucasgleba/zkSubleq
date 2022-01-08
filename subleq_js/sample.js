@@ -1,4 +1,4 @@
-const subleq = require("./step");
+const subleq = require("./subleq");
 
 const { INSTRUCTION_SIZE } = subleq.constants;
 
@@ -27,8 +27,8 @@ function formatSample(data) {
     aIn: data.startState.A.addr,
     bIn: data.startState.B.addr,
     cIn: data.startState.C.pos,
-    mRoot0: data.startState.root,
-    sRoot0: data.startState.mRoot,
+    mRoot0: data.startState.mRoot,
+    sRoot0: data.startState.root,
     aPathIndices: data.startState.A.addrPath.pathIndices,
     aPathElements: data.startState.A.addrPath.pathElements,
     bPathElements: data.startState.B.addrPath.pathElements,
