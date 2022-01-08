@@ -10,6 +10,11 @@ catch() {
 main() {
     cd ./test/$1/temp/
 
+    n_ptau=$(<../ptau.txt)
+    ptau0_fn="pot${n_ptau}_0000.ptau"
+    ptau1_fn="pot${n_ptau}_0001.ptau"
+    ptauf_fn="pot${n_ptau}_final.ptau"
+
     echo "compiling circuit to r1cs..."
     date
     circom ../circuit.circom --r1cs --wasm --sym
@@ -24,18 +29,18 @@ main() {
     # https://docs.circom.io/getting-started/proving-circuits/#powers-of-tau
     echo "[ptau] phase 1"
     date
-    if [ -e pot12_0001.ptau ]
+    if [ -e $ptau1_fn ]
     then
         echo "ptau file already exists. skipping..."
     else
-        snarkjs powersoftau new bn128 12 pot12_0000.ptau
-        snarkjs powersoftau contribute pot12_0000.ptau pot12_0001.ptau --name="First contribution" -v -e="$(date)"
+        snarkjs powersoftau new bn128 $n_ptau $ptau0_fn
+        snarkjs powersoftau contribute $ptau0_fn $ptau1_fn --name="First contribution" -v -e="$(date)"
     fi
     echo "[ptau] phase 2"
     date
-    snarkjs groth16 setup circuit.r1cs pot12_final.ptau circuit_0000.zkey || (
-        snarkjs powersoftau prepare phase2 pot12_0001.ptau pot12_final.ptau -v &&
-        snarkjs groth16 setup circuit.r1cs pot12_final.ptau circuit_0000.zkey
+    snarkjs groth16 setup circuit.r1cs $ptauf_fn circuit_0000.zkey || (
+        snarkjs powersoftau prepare phase2 $ptau1_fn $ptauf_fn -v &&
+        snarkjs groth16 setup circuit.r1cs $ptauf_fn circuit_0000.zkey
     )
     snarkjs zkey contribute circuit_0000.zkey circuit_0001.zkey --name="1st Contributor Name" -v -e="$(date)"
     snarkjs zkey export verificationkey circuit_0001.zkey verification_key.json

@@ -24,11 +24,11 @@ function genSample() {
 function formatSample(data) {
   return {
     pcIn: data.startState.pc,
-    aAddrIn: data.startState.A.addr,
-    bAddrIn: data.startState.B.addr,
+    aAddr: data.startState.A.addr,
+    bAddr: data.startState.B.addr,
+    aIn: data.startState.A.m,
+    bIn: data.startState.B.m,
     cIn: data.startState.C.pos,
-    aMIn: data.startState.A.m,
-    bMIn: data.startState.B.m,
     mRoot0: data.startState.mRoot,
     sRoot0: data.startState.root,
     aAddrPathIndices: data.startState.A.addrPath.pathIndices,
