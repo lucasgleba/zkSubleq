@@ -25,11 +25,18 @@ template Step(mLevels, mSlotSize) {
     signal input mRoot1;
     signal input sRoot1;
 
-    // sRoot is valid
+    // sRoot0 is valid
     component sRoot0Hasher = HashLeftRight();
     sRoot0Hasher.left <== pcIn;
     sRoot0Hasher.right <== mRoot0;
     sRoot0Hasher.hash === sRoot0;
+    
+    // sRoot1 is valid
+    component sRoot1Hasher = HashLeftRight();
+    sRoot1Hasher.left <== pcOut;
+    sRoot1Hasher.right <== mRoot1;
+    sRoot1Hasher.hash === sRoot1;
+
 }
 
 component main {public [sRoot0, sRoot1]} = Step(3, 32);

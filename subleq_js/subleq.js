@@ -91,6 +91,7 @@ function step(sTree, mTree) {
   };
 
   mTree.update(addrB.toJSNumber(), newMB);
+  sTree.update(0, newPc);
   sTree.update(1, mTree.root());
 
   const endState = {
