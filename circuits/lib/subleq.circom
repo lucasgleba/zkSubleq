@@ -1,7 +1,11 @@
 include "../../node_modules/circomlib/circuits/comparators.circom";
+include "../../node_modules/circomlib/circuits/gates.circom";
 include "../../node_modules/circomlib/circuits/mux1.circom";
 
 template Subleq(n) {
+
+    // assert(n <= 252);
+
     signal input pcIn;
     signal input aIn;
     signal input bIn;
@@ -13,23 +17,29 @@ template Subleq(n) {
     component bLTater = LessThan(n);
     bLTater.in[0] <== bIn;
     bLTater.in[1] <== aIn;
-    bLTa <== bLTater.out
+    bLTa <== bLTater.out;
 
-    bOut <== (2**n * bLTa + bIn - aIn);
+    var mod = 2 ** n;
 
-    signal bOutIsZero;
-    component bOutIsZeroter = isZero();
-    bOutIsZeroter.in <== bOut;
-    bOutIsZero <== bOutIsZeroter.out;
+    bOut <==  mod * bLTa + bIn - aIn;
 
-    signal bOutLetZero;
-    bOutLetZero <== bOutIsZero || bLTa;
+    signal bOutEQZero;
+    component bOutEQZeroer = IsZero();
+    bOutEQZeroer.in <== bOut;
+    bOutEQZero <== bOutEQZeroer.out;
+
+    signal bOutLEQZero;
+    component bOutLETZeroer = OR();
+    bOutLETZeroer.a <== bOutEQZero;
+    bOutLETZeroer.b <== bLTa;
+    bOutLEQZero <== bOutLETZeroer.out;
 
     component pcMux = Mux1();
 
-    pcMux.c[0] <== pcIn + 1
-    pcMux.c[1] <== cIn
-    pcMux.s <== bOutLetZero;
+    pcMux.c[0] <== pcIn + 1;
+    pcMux.c[1] <== cIn;
+    pcMux.s <== bOutLEQZero;
 
-    pcOut <== pcMux.out
+    pcOut <== pcMux.out;
+
 }
