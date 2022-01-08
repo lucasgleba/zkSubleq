@@ -1,4 +1,4 @@
-const subleq = require("./subleq");
+const subleq = require("./step");
 
 const { INSTRUCTION_SIZE } = subleq.constants;
 
