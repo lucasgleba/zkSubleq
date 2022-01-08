@@ -6,16 +6,20 @@ template Step(mLevels, mSlotSize) {
     // Internals
     signal input pcIn;
     // Sep Addr from M in A, B
-    signal input aIn;
-    signal input bIn;
+    signal input aAddrIn;
+    signal input bAddrIn;
     signal input cIn;
+    signal input aMIn;
+    signal input bMIn;
     // Externals
     signal input mRoot0;
     signal input sRoot0;
-    signal input aPathIndices[mLevels];
-    signal input aPathElements[mLevels];
-    signal input bPathElements[mLevels];
+    signal input aAddrPathIndices[mLevels];
+    signal input aAddrPathElements[mLevels];
+    signal input bAddrPathElements[mLevels];
     signal input cPathElements[mLevels];
+    signal input aMPathElements[mLevels];
+    signal input bMPathElements[mLevels];
 
     // State 1
     // Internals
