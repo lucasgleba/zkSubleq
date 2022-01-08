@@ -95,7 +95,7 @@ function step(sTree, mTree) {
 
   const endState = {
     root: sTree.root(),
-    mTree: mTree.root(),
+    mRoot: mTree.root(),
     pc: newPc,
     B: {
       m: newMB,

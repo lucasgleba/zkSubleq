@@ -5,7 +5,7 @@ const { INSTRUCTION_SIZE } = subleq.constants;
 function genSample() {
   const rawPc = 1;
 
-  const codeLen = 2; // instructions
+  const codeLen = 2; // n instructions
   const codeOffset = codeLen * INSTRUCTION_SIZE;
   const code = new Array(codeOffset).fill(0);
   const pcInsStartIndex = rawPc * INSTRUCTION_SIZE;
@@ -18,14 +18,33 @@ function genSample() {
 
   const mTree = subleq.genMTree(code, data);
   const sTree = subleq.genSTree(rawPc, mTree);
-
   return subleq.step(sTree, mTree);
+}
+
+function formatSample(data) {
+  return {
+    pcIn: data.startState.pc,
+    aIn: data.startState.A.addr,
+    bIn: data.startState.B.addr,
+    cIn: data.startState.C.pos,
+    mRoot0: data.startState.root,
+    sRoot0: data.startState.mRoot,
+    aPathIndices: data.startState.A.addrPath.pathIndices,
+    aPathElements: data.startState.A.addrPath.pathElements,
+    bPathElements: data.startState.B.addrPath.pathElements,
+    cPathElements: data.startState.C.posPath.pathElements,
+    pcOut: data.endState.pc,
+    bOut: data.endState.B.m,
+    mRoot1: data.endState.mRoot,
+    sRoot1: data.endState.root,
+  };
 }
 
 const filename = "sample";
 const fs = require("fs");
 const data = genSample();
-const dataStr = JSON.stringify(data, null, 4);
+const formattedData = formatSample(data);
+const dataStr = JSON.stringify(formattedData, null, 4);
 fs.writeFile(filename + ".json", dataStr, function (err, result) {
   if (err) console.log("error", err);
 });
