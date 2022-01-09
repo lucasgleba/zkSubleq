@@ -15,6 +15,8 @@ const { bigInt } = require("snarkjs");
 
 // ERROR in plus 1? in circom etc
 
+const TEST_INPUT_VALUE_RANGE = [0, 1, 2];
+
 async function checkSubleq(pcIn, aIn, bIn, cIn, circuit) {
   const input = { pcIn, aIn, bIn, cIn };
   const w = await circuit.calculateWitness(input, true);
@@ -30,8 +32,16 @@ describe("Test subleq circuit", function () {
   before(async () => {
     circuit = await getWasmTester("lib", "subleq");
   });
-  // TODO: Fuzzing
   it("Check test cases", async () => {
-    await checkSubleq(0, 0, 0, 1, circuit);
+    await TEST_INPUT_VALUE_RANGE.forEach(async (pcIn) => {
+      await TEST_INPUT_VALUE_RANGE.forEach(async (aIn) => {
+        await TEST_INPUT_VALUE_RANGE.forEach(async (bIn) => {
+          await TEST_INPUT_VALUE_RANGE.forEach(async (cIn) => {
+            // console.log(pcIn, aIn, bIn, cIn);
+            await checkSubleq(pcIn, aIn, bIn, cIn, circuit);
+          });
+        });
+      });
+    });
   });
 });
