@@ -2,10 +2,14 @@ include "./lib/subleq.circom";
 include "./lib/merkleTree.circom";
 include "../node_modules/circomlib/circuits/bitify.circom";
 
+// mLevels: 3, mSlotSize: 32
+// Merkle checking memory: 26506 constrains (99.86%)
+// Checking subleq: 37 constrains (0.14%)
+
 template Step(mLevels, mSlotSize) {
-    // State 0
+    // ******** State 0 ********
     // Internals
-    // Decimal sum x2, then bitify x2 OR bitify x1, then binary sum x2?
+    // Decimal sum x2, then bitify x2 OR bitify x1, then binary sum x2 [?]
     // 2 dec sum, 3 bitify VS. 2 bin sum, 1 bitify
     signal input pcIn; // ok
     signal input aAddr; // ok
@@ -22,7 +26,7 @@ template Step(mLevels, mSlotSize) {
     signal input aMPathElements[mLevels]; // ok
     signal input bMPathElements[mLevels]; // ok
 
-    // State 1
+    // ******** State 1 ********
     // Internals
     signal input pcOut; // merkle ok, missing subleq
     signal input bOut; // merkle ok, missing subleq
@@ -30,6 +34,7 @@ template Step(mLevels, mSlotSize) {
     signal input mRoot1; // ok
     signal input sRoot1; // ok (public)
 
+    // ******** Operand addresses ********
     // Derive aInsAddr, bInsAddr, cInsAddr FROM pcIn
     signal aInsAddr;
     signal bInsAddr;
@@ -38,6 +43,8 @@ template Step(mLevels, mSlotSize) {
     bInsAddr <== aInsAddr + 1;
     cInsAddr <== aInsAddr + 2; // bAddr + 1 OR aAddr + 2?
 
+
+    // ******** Merkle check sTrees ********
     // pcIn, mRoot0 are valid
     component sRoot0Hasher = HashLeftRight();
     sRoot0Hasher.left <== pcIn;
@@ -49,6 +56,7 @@ template Step(mLevels, mSlotSize) {
     sRoot1Hasher.right <== mRoot1;
     sRoot1Hasher.hash === sRoot1;
 
+    // ******** Merkle check mTrees ********
     // Bitify aInsAddr, bInsAddr, cInsAddr
     component aInsAddrBitifier = Num2Bits(mLevels);
     aInsAddrBitifier.in <== aInsAddr;
@@ -62,8 +70,7 @@ template Step(mLevels, mSlotSize) {
     component bAddrBitifier = Num2Bits(mLevels);
     bAddrBitifier.in <== bAddr;
 
-    // Merkle check aAddr, bAddr, cIn, bOut
-    // Setup aAddr, bAddr, CIn trees
+    // Setup aAddr, bAddr, CIn checkers
     component aAddrMerkleChecker = MerkleTreeChecker(mLevels);
     aAddrMerkleChecker.leaf <== aAddr;
     aAddrMerkleChecker.root <== mRoot0;
@@ -73,14 +80,14 @@ template Step(mLevels, mSlotSize) {
     component cInMerkleChecker = MerkleTreeChecker(mLevels);
     cInMerkleChecker.leaf <== cIn;
     cInMerkleChecker.root <== mRoot0;
-    // Setup aIn, bIn
+    // Setup aIn, bIn checkers
     component aInMerkleChecker = MerkleTreeChecker(mLevels);
     aInMerkleChecker.leaf <== aIn;
     aInMerkleChecker.root <== mRoot0;
     component bInMerkleChecker = MerkleTreeChecker(mLevels);
     bInMerkleChecker.leaf <== bIn;
     bInMerkleChecker.root <== mRoot0;
-    // Setup BOut tree
+    // Setup BOut checker
     component bOutMerkleChecker = MerkleTreeChecker(mLevels);
     bOutMerkleChecker.leaf <== bOut;
     bOutMerkleChecker.root <== mRoot1;
@@ -102,6 +109,15 @@ template Step(mLevels, mSlotSize) {
         bOutMerkleChecker.pathIndices[ii] <== bAddrBitifier.out[ii];
         bOutMerkleChecker.pathElements[ii] <== bMPathElements[ii];
     }
+
+    // ******** Check SUBLEQ ********
+    component subleqChecker = Subleq(mSlotSize);
+    subleqChecker.pcIn <== pcIn;
+    subleqChecker.aIn <== aIn;
+    subleqChecker.bIn <== bIn;
+    subleqChecker.cIn <== cIn;
+    subleqChecker.pcOut === pcOut;
+    subleqChecker.bOut === bOut;
 }
 
 component main {public [sRoot0, sRoot1]} = Step(3, 32);
