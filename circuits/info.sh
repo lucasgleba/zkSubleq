@@ -8,7 +8,7 @@ catch() {
 }
 
 main() {
-    cd ./test/$1/temp/
+    cd ./test/$1/build/
     date
     echo
     snarkjs r1cs info circuit.r1cs

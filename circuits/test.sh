@@ -8,7 +8,7 @@ catch() {
 }
 
 main() {
-    cd ./test/$1/temp/
+    cd ./test/$1/build/
 
     n_ptau=$(<../ptau.txt)
     ptau0_fn="pot${n_ptau}_0000.ptau"

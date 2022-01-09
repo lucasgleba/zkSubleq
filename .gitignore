@@ -1,5 +1,5 @@
 node_modules
 
-circuits/test/**/temp
+circuits/test/**/build
 *.ptau
 circuits/test/ptau

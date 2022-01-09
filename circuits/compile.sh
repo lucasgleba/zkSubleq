@@ -8,7 +8,7 @@ catch() {
 }
 
 main() {
-    cd ./test/$1/temp/
+    cd ./test/$1/build/
     echo "compiling circuit to r1cs..."
     date
     circom ../circuit.circom --r1cs --wasm --sym
