@@ -5,12 +5,12 @@ include "./lib/merkleTree.circom";
 include "../node_modules/circomlib/circuits/bitify.circom";
 
 // mLevels: 3, mSlotSize: 32
-// Merkle checking memory: 26506 constrains (99.86%)
-// Checking subleq: 37 constrains (0.14%)
+// Merkle checking memory: 26479 constrains (99.9%)
+// Checking subleq: 37 constrains (0.136%)
 
 template Step(mLevels, mSlotSize) {
-    // ******** State 0 ********
-    // Internals
+    // ******** INPUT ********
+    // Internals: pc, instruction, operands
     // Decimal sum x2, then bitify x2 OR bitify x1, then binary sum x2 [?]
     // 2 dec sum, 3 bitify VS. 2 bin sum, 1 bitify
     signal input pcIn; // ok
@@ -19,23 +19,50 @@ template Step(mLevels, mSlotSize) {
     signal input cIn; // ok
     signal input aIn; // ok
     signal input bIn; // ok
-    // Externals
+    // Externals: merkle proofs and roots
     signal input mRoot0; // ok
-    signal input sRoot0; // ok (public)
+    signal input sRoot0; // ok
     signal input aAddrPathElements[mLevels]; // ok
     signal input bAddrPathElements[mLevels]; // ok
     signal input cPathElements[mLevels]; // ok
     signal input aMPathElements[mLevels]; // ok
     signal input bMPathElements[mLevels]; // ok
 
-    // ******** State 1 ********
+    // ******** OUTPUT ********
     // Internals
-    signal input pcOut; // merkle ok, missing subleq
-    signal input bOut; // merkle ok, missing subleq
+    signal output pcOut;
+    signal output bOut;
     // Externals
-    signal input mRoot1; // ok
-    signal input sRoot1; // ok (public)
+    signal output mRoot1;
+    signal output sRoot1;
 
+    // ******** EXECUTE STEP ********
+    // Bitify bAddr
+    component bAddrBitifier = Num2Bits(mLevels);
+    bAddrBitifier.in <== bAddr;
+    // Set subleq
+    component subleqChecker = Subleq(mSlotSize);
+    subleqChecker.pcIn <== pcIn;
+    subleqChecker.aIn <== aIn;
+    subleqChecker.bIn <== bIn;
+    subleqChecker.cIn <== cIn;
+    pcOut <== subleqChecker.pcOut;
+    bOut <== subleqChecker.bOut;
+    // Set mRoot1
+    component m1Tree = MerkleTree(mLevels);
+    m1Tree.leaf <== bOut;
+    for (var ii = 0; ii < mLevels; ii++) {
+        m1Tree.pathIndices[ii] <== bAddrBitifier.out[ii];
+        m1Tree.pathElements[ii] <== bMPathElements[ii];
+    }
+    mRoot1 <== m1Tree.root;
+    // Set sRoot1
+    component s1Hash = HashLeftRight();
+    s1Hash.left <== pcOut;
+    s1Hash.right <== mRoot1;
+    sRoot1 <== s1Hash.hash;
+
+    // ******** CHECK STATE ********
     // ******** Operand addresses ********
     // Derive aInsAddr, bInsAddr, cInsAddr FROM pcIn
     signal aInsAddr;
@@ -45,18 +72,12 @@ template Step(mLevels, mSlotSize) {
     bInsAddr <== aInsAddr + 1;
     cInsAddr <== aInsAddr + 2; // bAddr + 1 OR aAddr + 2?
 
-
     // ******** Merkle check sTrees ********
     // pcIn, mRoot0 are valid
     component sRoot0Hasher = HashLeftRight();
     sRoot0Hasher.left <== pcIn;
     sRoot0Hasher.right <== mRoot0;
     sRoot0Hasher.hash === sRoot0;
-    // pcOut, mRoot1 are valid
-    component sRoot1Hasher = HashLeftRight();
-    sRoot1Hasher.left <== pcOut;
-    sRoot1Hasher.right <== mRoot1;
-    sRoot1Hasher.hash === sRoot1;
 
     // ******** Merkle check mTrees ********
     // Bitify aInsAddr, bInsAddr, cInsAddr
@@ -66,12 +87,10 @@ template Step(mLevels, mSlotSize) {
     bInsAddrBitifier.in <== bInsAddr;
     component cInsAddrBitifier = Num2Bits(mLevels);
     cInsAddrBitifier.in <== cInsAddr;
-    // Bitify aAddr, bAddr
+    // Bitify aAddr
     component aAddrBitifier = Num2Bits(mLevels);
     aAddrBitifier.in <== aAddr;
-    component bAddrBitifier = Num2Bits(mLevels);
-    bAddrBitifier.in <== bAddr;
-
+    // bAddr already bitified above
     // Setup aAddr, bAddr, CIn checkers
     component aAddrMerkleChecker = MerkleTreeChecker(mLevels);
     aAddrMerkleChecker.leaf <== aAddr;
@@ -89,10 +108,6 @@ template Step(mLevels, mSlotSize) {
     component bInMerkleChecker = MerkleTreeChecker(mLevels);
     bInMerkleChecker.leaf <== bIn;
     bInMerkleChecker.root <== mRoot0;
-    // Setup BOut checker
-    component bOutMerkleChecker = MerkleTreeChecker(mLevels);
-    bOutMerkleChecker.leaf <== bOut;
-    bOutMerkleChecker.root <== mRoot1;
 
     for (var ii = 0; ii < mLevels; ii++) {
         // Set proof[ii] for aAddr, bAddr, cIn
@@ -107,19 +122,61 @@ template Step(mLevels, mSlotSize) {
         aInMerkleChecker.pathElements[ii] <== aMPathElements[ii];
         bInMerkleChecker.pathIndices[ii] <== bAddrBitifier.out[ii];
         bInMerkleChecker.pathElements[ii] <== bMPathElements[ii];
-        // Set proof[ii] for bOut
-        bOutMerkleChecker.pathIndices[ii] <== bAddrBitifier.out[ii];
-        bOutMerkleChecker.pathElements[ii] <== bMPathElements[ii];
     }
-
-    // ******** Check SUBLEQ ********
-    component subleqChecker = Subleq(mSlotSize);
-    subleqChecker.pcIn <== pcIn;
-    subleqChecker.aIn <== aIn;
-    subleqChecker.bIn <== bIn;
-    subleqChecker.cIn <== cIn;
-    subleqChecker.pcOut === pcOut;
-    subleqChecker.bOut === bOut;
 }
 
-component main {public [sRoot0, sRoot1]} = Step(3, 32);
+template ValidStep(mLevels, mSlotSize) {
+    // ******** State 0 ********
+    // Internals
+    signal input pcIn;
+    signal input aAddr;
+    signal input bAddr;
+    signal input cIn;
+    signal input aIn;
+    signal input bIn;
+    // Externals
+    signal input mRoot0;
+    signal input sRoot0; // public
+    signal input aAddrPathElements[mLevels];
+    signal input bAddrPathElements[mLevels];
+    signal input cPathElements[mLevels];
+    signal input aMPathElements[mLevels];
+    signal input bMPathElements[mLevels];
+
+    // ******** State 1 ********
+    // Internals
+    signal input pcOut; // ok
+    signal input bOut; // ok
+    // Externals
+    signal input mRoot1;
+    signal input sRoot1; // public
+
+    // ******** Setup ********
+    component step = Step(mLevels, mSlotSize);
+
+    step.pcIn <== pcIn;
+    step.aAddr <== aAddr;
+    step.bAddr <== bAddr;
+    step.cIn <== cIn;
+    step.aIn <== aIn;
+    step.bIn <== bIn;
+    step.mRoot0 <== mRoot0;
+    step.sRoot0 <== sRoot0;
+
+    for (var ii = 0; ii < mLevels; ii++) {
+        step.aAddrPathElements[ii] <== aAddrPathElements[ii];
+        step.bAddrPathElements[ii] <== bAddrPathElements[ii];
+        step.cPathElements[ii] <== cPathElements[ii];
+        step.aMPathElements[ii] <== aMPathElements[ii];
+        step.bMPathElements[ii] <== bMPathElements[ii];
+    }
+
+    // ******** Assertion ********
+    step.pcOut === pcOut;
+    step.bOut === bOut;
+    step.mRoot1 === mRoot1;
+    step.sRoot1 === sRoot1;
+
+}
+
+component main {public [sRoot0, sRoot1]} = ValidStep(3, 32);

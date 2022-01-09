@@ -1,3 +1,4 @@
+// TODO: Test for failure if input is not valid
 const { getWasmTester } = require("./utils");
 const sample = require("../subleq_js/sample.js");
 
