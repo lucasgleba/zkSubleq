@@ -11,10 +11,10 @@ async function checkStep(data, circuit) {
   await circuit.assertOut(w, expectedOutput);
 }
 
-describe("Test multi step circuit", function () {
+describe("multi step circuit", function () {
   this.timeout(100000);
   it("multiStep_1_3_32", async () => {
-    let circuit = await getWasmTester("multiStep_1_3_32.circom");
+    let circuit = await getWasmTester("multi_step", "multiStep_1_3_32.circom");
     let data;
     for (let ii = 0; ii < N_TEST_CASES; ii++) {
       data = sample.formatSample(sample.genSample(ii, 3));

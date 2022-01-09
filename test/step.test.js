@@ -18,30 +18,39 @@ async function checkValidStep(data, circuit) {
   await circuit.assertOut(w, expectedOutput);
 }
 
-describe("Test step circuit", function () {
+describe("step circuit", function () {
   this.timeout(100000);
-  it("step_3_32", async () => {
-    let circuit = await getWasmTester("step_3_32.circom");
-    let data;
-    for (let ii = 0; ii < N_TEST_CASES; ii++) {
-      data = sample.formatSample(sample.genSample(ii, 3));
-      await checkStep(data, circuit);
-    }
+  describe("step io", function () {
+    [
+      // [3, 32],
+      // [4, 32],
+      [8, 32],
+      // [16, 32],
+    ].forEach(function (params) {
+      const [md, ss] = params;
+      const cname = `step_${md}_${ss}`;
+      it(cname, async () => {
+        let circuit = await getWasmTester("step", cname + ".circom");
+        let data;
+        for (let ii = 0; ii < N_TEST_CASES; ii++) {
+          data = sample.formatSample(sample.genSample(ii, md));
+          await checkStep(data, circuit);
+        }
+      });
+    });
   });
-  it("step_4_32", async () => {
-    let circuit = await getWasmTester("step_4_32.circom");
-    let data;
-    for (let ii = 0; ii < N_TEST_CASES; ii++) {
-      data = sample.formatSample(sample.genSample(ii, 4));
-      await checkStep(data, circuit);
-    }
-  });
-  it("valid_step_3_32", async () => {
-    let circuit = await getWasmTester("valid_step_3_32.circom");
-    let data;
-    for (let ii = 0; ii < N_TEST_CASES; ii++) {
-      data = sample.formatSample(sample.genSample(ii, 3));
-      await checkValidStep(data, circuit);
-    }
+  describe("valid step constrain", function () {
+    [[3, 32]].forEach(function (params) {
+      const [md, ss] = params;
+      const cname = `valid_step_${md}_${ss}`;
+      it(cname, async () => {
+        let circuit = await getWasmTester("step", cname + ".circom");
+        let data;
+        for (let ii = 0; ii < N_TEST_CASES; ii++) {
+          data = sample.formatSample(sample.genSample(ii, md));
+          await checkValidStep(data, circuit);
+        }
+      });
+    });
   });
 });
