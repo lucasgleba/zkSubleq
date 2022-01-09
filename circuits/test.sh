@@ -20,10 +20,12 @@ main() {
     circom ../circuit.circom --r1cs --wasm --sym
     echo
     snarkjs r1cs info circuit.r1cs
+    echo
 
     echo "calculating witness..."
     date
     node ./circuit_js/generate_witness.js ./circuit_js/circuit.wasm ../input.json witness.wtns
+    echo
 
     echo "running powers of tau ceremony..."
     # https://docs.circom.io/getting-started/proving-circuits/#powers-of-tau
@@ -49,10 +51,12 @@ main() {
         snarkjs zkey contribute circuit_0000.zkey circuit_0001.zkey --name="1st Contributor Name" -v -e="$(date)"
         snarkjs zkey export verificationkey circuit_0001.zkey verification_key.json
     fi
+    echo
 
     echo "generating proof..."
     date
     snarkjs groth16 prove circuit_0001.zkey witness.wtns proof.json public.json
+    echo
 
     echo "verifying proof..."
     date
@@ -70,6 +74,7 @@ main() {
         echo ""
         exit 1
     fi
+    echo
 
     # echo "clearing files"
     # date
