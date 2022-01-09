@@ -10,11 +10,11 @@ async function checkStep(inputJson, circuit) {
   await circuit.assertOut(w, expectedOutput);
 }
 
-describe("Test step circuit", function () {
+describe("Test multi step circuit", function () {
   this.timeout(100000);
   let circuit;
   before(async () => {
-    circuit = await getWasmTester("multiStep");
+    circuit = await getWasmTester("multiStep_1_3_32.circom");
   });
   it(`Check ${N_TEST_CASES} test cases`, async () => {
     let inputJson;

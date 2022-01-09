@@ -30,7 +30,7 @@ describe("Test subleq circuit", function () {
   this.timeout(100000);
   let circuit;
   before(async () => {
-    circuit = await getWasmTester("lib", "subleq");
+    circuit = await getWasmTester("subleq_32.circom");
   });
   it(`Check ${TEST_INPUT_VALUE_RANGE.length ** 4} test cases`, async () => {
     // await checkSubleq(1, 5, 5, 5, circuit);
