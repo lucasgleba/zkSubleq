@@ -1,4 +1,5 @@
 // https://github.com/tornadocash/tornado-core/blob/master/circuits/merkleTree.circom
+pragma circom 2.0.2;
 
 include "../../node_modules/circomlib/circuits/mimcsponge.circom";
 
