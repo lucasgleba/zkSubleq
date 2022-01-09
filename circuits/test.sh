@@ -38,12 +38,17 @@ main() {
     fi
     echo "[ptau] phase 2"
     date
-    snarkjs groth16 setup circuit.r1cs $ptauf_fn circuit_0000.zkey || (
+    if [ -e verification_key.json ]
+    then
+        echo "verification key already exists. skipping..."
+    else
+        snarkjs groth16 setup circuit.r1cs $ptauf_fn circuit_0000.zkey || (
         snarkjs powersoftau prepare phase2 $ptau1_fn $ptauf_fn -v &&
         snarkjs groth16 setup circuit.r1cs $ptauf_fn circuit_0000.zkey
     )
-    snarkjs zkey contribute circuit_0000.zkey circuit_0001.zkey --name="1st Contributor Name" -v -e="$(date)"
-    snarkjs zkey export verificationkey circuit_0001.zkey verification_key.json
+        snarkjs zkey contribute circuit_0000.zkey circuit_0001.zkey --name="1st Contributor Name" -v -e="$(date)"
+        snarkjs zkey export verificationkey circuit_0001.zkey verification_key.json
+    fi
 
     echo "generating proof..."
     date

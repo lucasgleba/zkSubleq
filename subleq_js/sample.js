@@ -25,13 +25,13 @@ function formatSample(data) {
   return {
     pcIn: data.startState.pc,
     aAddr: data.startState.A.addr,
-    bAddr: data.startState.B.addr,
+    bAddr: data.startState.B.addr, // aAddr + 1
     aIn: data.startState.A.m,
     bIn: data.startState.B.m,
     cIn: data.startState.C.pos,
     mRoot0: data.startState.mRoot,
     sRoot0: data.startState.root,
-    aAddrPathIndices: data.startState.A.addrPath.pathIndices,
+    // aAddrPathIndices: data.startState.A.addrPath.pathIndices,
     aAddrPathElements: data.startState.A.addrPath.pathElements,
     bAddrPathElements: data.startState.B.addrPath.pathElements,
     cPathElements: data.startState.C.posPath.pathElements,

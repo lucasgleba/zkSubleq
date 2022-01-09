@@ -1,6 +1,6 @@
 #!/bin/bash
 date
-for ii in lib/subleq
+for ii in lib/subleq step
 do
     printf '%s' "$ii"
     sh test.sh $ii > ./test/$ii/temp/stdout.txt 2>&1 ./test/$ii/temp/stderr.txt && echo " [OK]" || echo " [FAIL]"
