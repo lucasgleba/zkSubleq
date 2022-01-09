@@ -2,7 +2,7 @@
 const { getWasmTester } = require("./utils");
 const sample = require("../subleq_js/sample.js");
 
-const N_TEST_CASES = 10;
+const { N_TEST_CASES } = require("./config");
 
 async function checkStep(data, circuit) {
   const inputJson = Object.assign({}, data.input);
@@ -24,7 +24,15 @@ describe("Test step circuit", function () {
     let circuit = await getWasmTester("step_3_32.circom");
     let data;
     for (let ii = 0; ii < N_TEST_CASES; ii++) {
-      data = sample.formatSample(sample.genSample(ii));
+      data = sample.formatSample(sample.genSample(ii, 3));
+      await checkStep(data, circuit);
+    }
+  });
+  it("step_4_32", async () => {
+    let circuit = await getWasmTester("step_4_32.circom");
+    let data;
+    for (let ii = 0; ii < N_TEST_CASES; ii++) {
+      data = sample.formatSample(sample.genSample(ii, 4));
       await checkStep(data, circuit);
     }
   });
@@ -32,7 +40,7 @@ describe("Test step circuit", function () {
     let circuit = await getWasmTester("valid_step_3_32.circom");
     let data;
     for (let ii = 0; ii < N_TEST_CASES; ii++) {
-      data = sample.formatSample(sample.genSample(ii));
+      data = sample.formatSample(sample.genSample(ii, 3));
       await checkValidStep(data, circuit);
     }
   });

@@ -1,10 +1,6 @@
 const subleq = require("./subleq");
 
-const { INSTRUCTION_SIZE, MEMORY_SIZE, TWO_POW_M_SLOT_SIZE } = subleq.constants;
-
-// const MAX_M_VALUE_P1 = TWO_POW_M_SLOT_SIZE.toJSNumber();
-const SAFE_LAZY_GEN_VALUE_P1 = MEMORY_SIZE - 2;
-const SEED = 0; // For genFixedSample
+const DEFAULT_SEED = 0;
 
 // WARNING: Not good randomness!
 function Random(seed) {
@@ -20,15 +16,21 @@ function Random(seed) {
   };
 }
 
-function genSample(seed) {
+function genSample(seed, memory_depth) {
+  seed = seed || DEFAULT_SEED;
+  memory_depth = memory_depth || 3;
+
+  const memory_size = 2 ** memory_depth;
+  const safe_lazy_gen_value_p1 = memory_size - 2;
+
   const random = new Random(seed);
 
-  const rawPc = random.random(Math.floor(SAFE_LAZY_GEN_VALUE_P1 / 3));
+  const rawPc = random.random(Math.floor(safe_lazy_gen_value_p1 / 3));
   const code = [];
   const data = [];
 
-  for (let ii = 0; ii < MEMORY_SIZE; ii++) {
-    code.push(random.random(SAFE_LAZY_GEN_VALUE_P1));
+  for (let ii = 0; ii < memory_size; ii++) {
+    code.push(random.random(safe_lazy_gen_value_p1));
   }
 
   const mTree = subleq.genMTree(code, data);
@@ -37,7 +39,7 @@ function genSample(seed) {
 }
 
 function genFixedSample() {
-  return genSample(SEED);
+  return genSample(DEFAULT_SEED, 3);
   // const rawPc = 1;
   // const codeLen = 2; // n instructions
   // const codeOffset = codeLen * INSTRUCTION_SIZE;
