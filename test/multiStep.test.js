@@ -13,12 +13,80 @@ async function checkStep(data, circuit) {
 
 describe("multi step circuit", function () {
   this.timeout(100000);
-  it("multiStep_1_3_32", async () => {
-    let circuit = await getWasmTester("multi_step", "multiStep_1_3_32.circom");
+  it("validMultiStep_1_3_32", async () => {
+    let circuit = await getWasmTester(
+      "multi_step",
+      "validMultiStep_1_3_32.circom"
+    );
     let data;
     for (let ii = 0; ii < N_TEST_CASES; ii++) {
       data = sample.formatSample(sample.genSample(ii, 3));
       await checkStep(data, circuit);
     }
+  });
+  // signal input pcIn;
+  // signal input aAddr[nSteps];
+  // signal input bAddr[nSteps];
+  // signal input cIn[nSteps];
+  // signal input aIn[nSteps];
+  // signal input bIn[nSteps];
+  // // Externals: merkle proofs and roots
+  // signal input mRoot0;
+  // signal input sRoot0;
+  // signal input aAddrPathElements[nSteps][mLevels];
+  // signal input bAddrPathElements[nSteps][mLevels];
+  // signal input cPathElements[nSteps][mLevels];
+  // signal input aMPathElements[nSteps][mLevels];
+  // signal input bMPathElements[nSteps][mLevels];
+
+  // // ******** OUTPUT ********
+  // // Internals
+  // signal output pcOut;
+  // // signal output bOut;
+  // // Externals
+  // signal output mRoot1;
+  // signal output sRoot1;
+  it("multiStep_8_5_32", async () => {
+    let circuit = await getWasmTester("multi_step", "multiStep_8_5_32.circom");
+    // seed, memoryDepth, nSteps
+    // seed, memoryDepth are hardcode inside the function at the moment
+    const stepsData = sample.genSampleMultiStep(0, 5, 8);
+    const firstStep = stepsData[0];
+    const lastStep = stepsData[stepsData.length - 1];
+    const data = {
+      pcIn: firstStep.startState.pc,
+      mRoot0: firstStep.startState.mRoot,
+      sRoot0: firstStep.startState.root,
+      aAddr: [],
+      bAddr: [],
+      cIn: [],
+      aIn: [],
+      bIn: [],
+      aAddrPathElements: [],
+      bAddrPathElements: [],
+      cPathElements: [],
+      aMPathElements: [],
+      bMPathElements: [],
+    };
+    stepsData.forEach(function (stepData) {
+      stepData = sample.formatSample(stepData).input;
+      data.aAddr.push(stepData.aAddr);
+      data.bAddr.push(stepData.bAddr);
+      data.cIn.push(stepData.cIn);
+      data.aIn.push(stepData.aIn);
+      data.bIn.push(stepData.bIn);
+      data.aAddrPathElements.push(stepData.aAddrPathElements);
+      data.bAddrPathElements.push(stepData.bAddrPathElements);
+      data.cPathElements.push(stepData.cPathElements);
+      data.aMPathElements.push(stepData.aMPathElements);
+      data.bMPathElements.push(stepData.bMPathElements);
+    });
+    const w = await circuit.calculateWitness(data, true);
+    const expectedOutput = {
+      pcOut: lastStep.endState.pc,
+      mRoot1: lastStep.endState.mRoot,
+      sRoot1: lastStep.endState.root,
+    };
+    await circuit.assertOut(w, expectedOutput);
   });
 });

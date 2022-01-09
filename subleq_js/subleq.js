@@ -5,8 +5,8 @@ const { bigInt } = require("snarkjs");
 const stringifyBigInts =
   require("websnark/tools/stringifybigint").stringifyBigInts;
 
-const MEMORY_DEPTH = 3;
-const MEMORY_SIZE = 2 ** MEMORY_DEPTH;
+// const MEMORY_DEPTH = 3;
+// const MEMORY_SIZE = 2 ** MEMORY_DEPTH;
 const INSTRUCTION_SIZE = 3;
 const MEMORY_SLOT_SIZE = 32;
 const TWO_POW_M_SLOT_SIZE = bigInt(2).pow(bigInt(MEMORY_SLOT_SIZE));
@@ -25,9 +25,10 @@ function toMemory(code, data) {
   });
 }
 
-function genMTree(code, data) {
+function genMTree(code, data, memoryDepth) {
+  memoryDepth = memoryDepth || 3;
   memory = toMemory(code, data);
-  return new MerkleTree(MEMORY_DEPTH, memory);
+  return new MerkleTree(memoryDepth, memory);
 }
 
 function genSTree(pc, mTree) {
@@ -109,10 +110,19 @@ function step(sTree, mTree) {
   });
 }
 
+function multiStep(sTree, mTree, nSteps) {
+  const states = [];
+  for (let ii = 0; ii < nSteps; ii++) {
+    states.push(step(sTree, mTree));
+  }
+  // console.log(sTree._layers[0]);
+  // console.log(mTree._layers[0].slice(0, 25));
+  // console.log(mTree._layers[0].slice(25, 32));
+  return states;
+}
+
 module.exports = {
   constants: {
-    MEMORY_DEPTH,
-    MEMORY_SIZE,
     INSTRUCTION_SIZE,
     MEMORY_SLOT_SIZE,
     TWO_POW_M_SLOT_SIZE,
@@ -121,4 +131,5 @@ module.exports = {
   genSTree,
   subleq,
   step,
+  multiStep,
 };

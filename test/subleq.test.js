@@ -22,7 +22,6 @@ async function checkSubleq(pcIn, aIn, bIn, cIn, circuit) {
   const bOut = fit2Comp(bIn - aIn);
   const pcOut = bOut.lesserOrEquals(bigInt.zero) ? cIn : pcIn + 1;
   const expectedOutput = { pcOut, bOut };
-  // console.log(input, expectedOutput);
   await circuit.assertOut(w, expectedOutput);
 }
 
@@ -34,7 +33,6 @@ describe("subleq circuit", function () {
       await TEST_INPUT_VALUE_RANGE.forEach(async (aIn) => {
         await TEST_INPUT_VALUE_RANGE.forEach(async (bIn) => {
           await TEST_INPUT_VALUE_RANGE.forEach(async (cIn) => {
-            // console.log(pcIn, aIn, bIn, cIn);
             await checkSubleq(pcIn, aIn, bIn, cIn, circuit);
           });
         });
