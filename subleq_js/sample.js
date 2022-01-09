@@ -105,7 +105,7 @@ function genSampleMultiStep(seed, memoryDepth, nSteps) {
 }
 
 function genFixedSample() {
-  return genSample(DEFAULT_SEED, 3);
+  return genSample(DEFAULT_SEED, 13);
   // const rawPc = 1;
   // const codeLen = 2; // n instructions
   // const codeOffset = codeLen * INSTRUCTION_SIZE;
