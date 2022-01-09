@@ -28,13 +28,8 @@ async function checkSubleq(pcIn, aIn, bIn, cIn, circuit) {
 
 describe("Test subleq circuit", function () {
   this.timeout(100000);
-  let circuit;
-  before(async () => {
-    circuit = await getWasmTester("subleq_32.circom");
-  });
-  it(`Check ${TEST_INPUT_VALUE_RANGE.length ** 4} test cases`, async () => {
-    // await checkSubleq(1, 5, 5, 5, circuit);
-    // return;
+  it("subleq_32", async () => {
+    let circuit = await getWasmTester("subleq_32.circom");
     await TEST_INPUT_VALUE_RANGE.forEach(async (pcIn) => {
       await TEST_INPUT_VALUE_RANGE.forEach(async (aIn) => {
         await TEST_INPUT_VALUE_RANGE.forEach(async (bIn) => {

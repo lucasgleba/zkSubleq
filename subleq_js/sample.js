@@ -4,7 +4,7 @@ const { INSTRUCTION_SIZE, MEMORY_SIZE, TWO_POW_M_SLOT_SIZE } = subleq.constants;
 
 // const MAX_M_VALUE_P1 = TWO_POW_M_SLOT_SIZE.toJSNumber();
 const SAFE_LAZY_GEN_VALUE_P1 = MEMORY_SIZE - 2;
-const SEED = 1234; // For genFixedSample
+const SEED = 0; // For genFixedSample
 
 // WARNING: Not good randomness!
 function Random(seed) {
@@ -54,33 +54,40 @@ function genFixedSample() {
 
 function formatSample(data) {
   return {
-    pcIn: data.startState.pc,
-    aAddr: data.startState.A.addr,
-    bAddr: data.startState.B.addr, // aAddr + 1
-    aIn: data.startState.A.m,
-    bIn: data.startState.B.m,
-    cIn: data.startState.C.pos,
-    mRoot0: data.startState.mRoot,
-    sRoot0: data.startState.root,
-    // aAddrPathIndices: data.startState.A.addrPath.pathIndices,
-    aAddrPathElements: data.startState.A.addrPath.pathElements,
-    bAddrPathElements: data.startState.B.addrPath.pathElements,
-    cPathElements: data.startState.C.posPath.pathElements,
-    aMPathElements: data.startState.A.mPath.pathElements,
-    bMPathElements: data.startState.B.mPath.pathElements,
-    // pcOut: data.endState.pc,
-    // bOut: data.endState.B.m,
-    // mRoot1: data.endState.mRoot,
-    sRoot1: data.endState.root,
+    input: {
+      pcIn: data.startState.pc,
+      aAddr: data.startState.A.addr,
+      bAddr: data.startState.B.addr, // aAddr + 1
+      aIn: data.startState.A.m,
+      bIn: data.startState.B.m,
+      cIn: data.startState.C.pos,
+      mRoot0: data.startState.mRoot,
+      sRoot0: data.startState.root,
+      aAddrPathElements: data.startState.A.addrPath.pathElements,
+      bAddrPathElements: data.startState.B.addrPath.pathElements,
+      cPathElements: data.startState.C.posPath.pathElements,
+      aMPathElements: data.startState.A.mPath.pathElements,
+      bMPathElements: data.startState.B.mPath.pathElements,
+      sRoot1: data.endState.root,
+    },
+    internalOutput: {
+      pcOut: data.endState.pc,
+      // bOut: data.endState.B.m,
+      mRoot1: data.endState.mRoot,
+      sRoot1: data.endState.root,
+    },
+    // output: {
+    //   sRoot0: data.startState.root,
+    //   sRoot1: data.endState.root,
+    // },
   };
 }
 
 function main() {
   const filename = "sample";
   const fs = require("fs");
-  // const data = genFixedSample();
-  const data = genSample(0);
-  const formattedData = formatSample(data);
+  const data = genFixedSample();
+  const formattedData = formatSample(data).input;
   const dataStr = JSON.stringify(formattedData, null, 4);
   fs.writeFile(filename + ".json", dataStr, function (err, result) {
     if (err) console.log("error", err);
