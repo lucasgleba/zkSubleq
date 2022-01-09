@@ -66,5 +66,5 @@ template MerkleTreeChecker(levels) {
         tree.pathIndices[ii] <== pathIndices[ii];
     }
     
-    root === tree.root;
+    tree.root === root;
 }

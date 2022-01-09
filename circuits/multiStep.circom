@@ -1,3 +1,5 @@
+pragma circom 2.0.2;
+
 include "./step.circom";
 
 template MultiStep(nSteps, mLevels, mSlotSize) {
@@ -21,7 +23,7 @@ template MultiStep(nSteps, mLevels, mSlotSize) {
     // ******** OUTPUT ********
     // Internals
     signal output pcOut;
-    signal output bOut;
+    // signal output bOut;
     // Externals
     signal output mRoot1;
     signal output sRoot1;
@@ -71,8 +73,62 @@ template MultiStep(nSteps, mLevels, mSlotSize) {
     }
 
     pcOut <== steps[nSteps - 1].pcOut;
-    bOut <== steps[nSteps - 1].bOut;
+    // bOut <== steps[nSteps - 1].bOut;
     mRoot1 <== steps[nSteps - 1].mRoot1;
     sRoot1 <== steps[nSteps - 1].sRoot1;
+
+}
+
+template ValidMultiStep(nSteps, mLevels, mSlotSize) {
+    // ******** State 0 ********
+    // Internals: pc, instruction, operands
+    signal input pcIn;
+    signal input aAddr[nSteps];
+    signal input bAddr[nSteps];
+    signal input cIn[nSteps];
+    signal input aIn[nSteps];
+    signal input bIn[nSteps];
+    // Externals: merkle proofs and roots
+    signal input mRoot0;
+    signal input sRoot0;
+    signal input aAddrPathElements[nSteps][mLevels];
+    signal input bAddrPathElements[nSteps][mLevels];
+    signal input cPathElements[nSteps][mLevels];
+    signal input aMPathElements[nSteps][mLevels];
+    signal input bMPathElements[nSteps][mLevels];
+
+    // ******** State 1 ********
+    // Internals
+    // signal output pcOut;
+    // signal output bOut;
+    // Externals
+    // signal output mRoot1;
+    signal input sRoot1;
+
+    // ******** Setup ********
+    component multiStep = MultiStep(nSteps, mLevels, mSlotSize);
+    
+    multiStep.pcIn <== pcIn;
+    multiStep.mRoot0 <== mRoot0;
+    multiStep.sRoot0 <== sRoot0;
+    
+    for (var ii = 0; ii < nSteps; ii++) {
+        multiStep.aAddr[ii] <== aAddr[ii];
+        multiStep.bAddr[ii] <== bAddr[ii];
+        multiStep.cIn[ii] <== cIn[ii];
+        multiStep.aIn[ii] <== aIn[ii];
+        multiStep.bIn[ii] <== bIn[ii];
+
+        for (var jj = 0; jj < mLevels; jj++) {
+            multiStep.aAddrPathElements[ii][jj] <== aAddrPathElements[ii][jj];
+            multiStep.bAddrPathElements[ii][jj] <== bAddrPathElements[ii][jj];
+            multiStep.cPathElements[ii][jj] <== cPathElements[ii][jj];
+            multiStep.aMPathElements[ii][jj] <== aMPathElements[ii][jj];
+            multiStep.bMPathElements[ii][jj] <== bMPathElements[ii][jj];
+        }
+    }
+
+    // ******** Assertion ********
+    multiStep.sRoot1 === sRoot1;
 
 }

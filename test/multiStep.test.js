@@ -14,7 +14,7 @@ describe("Test step circuit", function () {
   this.timeout(100000);
   let circuit;
   before(async () => {
-    circuit = await getWasmTester("step");
+    circuit = await getWasmTester("multiStep");
   });
   it(`Check ${N_TEST_CASES} test cases`, async () => {
     let inputJson;

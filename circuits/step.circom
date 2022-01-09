@@ -31,7 +31,8 @@ template Step(mLevels, mSlotSize) {
     // ******** OUTPUT ********
     // Internals
     signal output pcOut;
-    signal output bOut;
+    // signal output bOut;
+    signal bOut;
     // Externals
     signal output mRoot1;
     signal output sRoot1;
