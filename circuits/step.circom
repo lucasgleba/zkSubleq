@@ -178,5 +178,3 @@ template ValidStep(mLevels, mSlotSize) {
     step.sRoot1 === sRoot1;
 
 }
-
-component main {public [sRoot0, sRoot1]} = ValidStep(3, 32);
