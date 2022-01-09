@@ -1,3 +1,4 @@
+// TODO: Improve naming
 const MerkleTree = require("fixed-merkle-tree");
 const { fit2Comp } = require("./utils");
 const { bigInt } = require("snarkjs");
@@ -5,6 +6,7 @@ const stringifyBigInts =
   require("websnark/tools/stringifybigint").stringifyBigInts;
 
 const MEMORY_DEPTH = 3;
+const MEMORY_SIZE = 2 ** MEMORY_DEPTH;
 const INSTRUCTION_SIZE = 3;
 const MEMORY_SLOT_SIZE = 32;
 const TWO_POW_M_SLOT_SIZE = bigInt(2).pow(bigInt(MEMORY_SLOT_SIZE));
@@ -35,7 +37,6 @@ function genSTree(pc, mTree) {
 
 function subleq(pc, mTree) {
   const insStartIndex = pc.toJSNumber() * INSTRUCTION_SIZE;
-  const bIndex = insStartIndex + 1;
   const ins = mTree._layers[0].slice(insStartIndex, insStartIndex + 3);
   const [addrA, addrB, posC] = ins;
   const mA = mTree._layers[0][addrA];
@@ -44,7 +45,7 @@ function subleq(pc, mTree) {
   if (mB.lesserOrEquals(mA)) {
     pc = posC;
   } else {
-    pc.add(bigInt(1));
+    pc = pc.add(bigInt(1));
   }
   // mTree.update(bIndex, newMB);
   return { insStartIndex, newPc: pc, addrA, addrB, posC, mA, mB, newMB };
@@ -111,6 +112,7 @@ function step(sTree, mTree) {
 module.exports = {
   constants: {
     MEMORY_DEPTH,
+    MEMORY_SIZE,
     INSTRUCTION_SIZE,
     MEMORY_SLOT_SIZE,
     TWO_POW_M_SLOT_SIZE,

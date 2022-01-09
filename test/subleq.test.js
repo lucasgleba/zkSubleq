@@ -22,6 +22,7 @@ async function checkSubleq(pcIn, aIn, bIn, cIn, circuit) {
   const bOut = fit2Comp(bIn - aIn);
   const pcOut = bOut.lesserOrEquals(bigInt.zero) ? cIn : pcIn + 1;
   const expectedOutput = { pcOut, bOut };
+  // console.log(input, expectedOutput);
   await circuit.assertOut(w, expectedOutput);
 }
 
@@ -31,7 +32,9 @@ describe("Test subleq circuit", function () {
   before(async () => {
     circuit = await getWasmTester("lib", "subleq");
   });
-  it("Check test cases", async () => {
+  it(`Check ${TEST_INPUT_VALUE_RANGE.length ** 4} test cases`, async () => {
+    // await checkSubleq(1, 5, 5, 5, circuit);
+    // return;
     await TEST_INPUT_VALUE_RANGE.forEach(async (pcIn) => {
       await TEST_INPUT_VALUE_RANGE.forEach(async (aIn) => {
         await TEST_INPUT_VALUE_RANGE.forEach(async (bIn) => {
