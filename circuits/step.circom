@@ -11,17 +11,16 @@ template Step(mLevels, mSlotSize) {
     signal input aAddr; // ok
     signal input bAddr; // ok
     signal input cIn; // ok
-    signal input aIn;
-    signal input bIn;
+    signal input aIn; // ok
+    signal input bIn; // ok
     // Externals
     signal input mRoot0; // ok
     signal input sRoot0; // ok (public)
-    // signal input aAddrPathIndices[mLevels];
     signal input aAddrPathElements[mLevels]; // ok
     signal input bAddrPathElements[mLevels]; // ok
     signal input cPathElements[mLevels]; // ok
-    signal input aMPathElements[mLevels];
-    signal input bMPathElements[mLevels];
+    signal input aMPathElements[mLevels]; // ok
+    signal input bMPathElements[mLevels]; // ok
 
     // State 1
     // Internals
@@ -44,7 +43,6 @@ template Step(mLevels, mSlotSize) {
     sRoot0Hasher.left <== pcIn;
     sRoot0Hasher.right <== mRoot0;
     sRoot0Hasher.hash === sRoot0;
-    
     // pcOut, mRoot1 are valid
     component sRoot1Hasher = HashLeftRight();
     sRoot1Hasher.left <== pcOut;
@@ -58,7 +56,6 @@ template Step(mLevels, mSlotSize) {
     bInsAddrBitifier.in <== bInsAddr;
     component cInsAddrBitifier = Num2Bits(mLevels);
     cInsAddrBitifier.in <== cInsAddr;
-
     // Bitify aAddr, bAddr
     component aAddrBitifier = Num2Bits(mLevels);
     aAddrBitifier.in <== aAddr;
@@ -76,6 +73,13 @@ template Step(mLevels, mSlotSize) {
     component cInMerkleChecker = MerkleTreeChecker(mLevels);
     cInMerkleChecker.leaf <== cIn;
     cInMerkleChecker.root <== mRoot0;
+    // Setup aIn, bIn
+    component aInMerkleChecker = MerkleTreeChecker(mLevels);
+    aInMerkleChecker.leaf <== aIn;
+    aInMerkleChecker.root <== mRoot0;
+    component bInMerkleChecker = MerkleTreeChecker(mLevels);
+    bInMerkleChecker.leaf <== bIn;
+    bInMerkleChecker.root <== mRoot0;
     // Setup BOut tree
     component bOutMerkleChecker = MerkleTreeChecker(mLevels);
     bOutMerkleChecker.leaf <== bOut;
@@ -89,6 +93,11 @@ template Step(mLevels, mSlotSize) {
         bAddrMerkleChecker.pathElements[ii] <== bAddrPathElements[ii];
         cInMerkleChecker.pathIndices[ii] <== cInsAddrBitifier.out[ii];
         cInMerkleChecker.pathElements[ii] <== cPathElements[ii];
+        // Set proof[ii] for aIn, bIn
+        aInMerkleChecker.pathIndices[ii] <== aAddrBitifier.out[ii];
+        aInMerkleChecker.pathElements[ii] <== aMPathElements[ii];
+        bInMerkleChecker.pathIndices[ii] <== bAddrBitifier.out[ii];
+        bInMerkleChecker.pathElements[ii] <== bMPathElements[ii];
         // Set proof[ii] for bOut
         bOutMerkleChecker.pathIndices[ii] <== bAddrBitifier.out[ii];
         bOutMerkleChecker.pathElements[ii] <== bMPathElements[ii];
