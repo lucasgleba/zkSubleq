@@ -1,1 +1,1 @@
-const N_TEST_CASES = 1;
+const N_TEST_CASES = 5;
