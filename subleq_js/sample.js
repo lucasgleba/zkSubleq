@@ -44,12 +44,23 @@ function formatSample(data) {
   };
 }
 
-const filename = "sample";
-const fs = require("fs");
-const data = genSample();
-const formattedData = formatSample(data);
-const dataStr = JSON.stringify(formattedData, null, 4);
-fs.writeFile(filename + ".json", dataStr, function (err, result) {
-  if (err) console.log("error", err);
-});
-console.log(dataStr, `> ${filename}.json`);
+function main() {
+  const filename = "sample";
+  const fs = require("fs");
+  const data = genSample();
+  const formattedData = formatSample(data);
+  const dataStr = JSON.stringify(formattedData, null, 4);
+  fs.writeFile(filename + ".json", dataStr, function (err, result) {
+    if (err) console.log("error", err);
+  });
+  console.log(dataStr, `> ${filename}.json`);
+}
+
+if (!module.parent) {
+  main();
+}
+
+module.exports = {
+  genSample,
+  formatSample,
+};

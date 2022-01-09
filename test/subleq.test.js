@@ -10,10 +10,9 @@
 
 // const assert = chai.assert;
 
-const { getWasmTester, fit2Comp } = require("./utils");
+const { getWasmTester } = require("./utils");
+const { fit2Comp } = require("../subleq_js/utils");
 const { bigInt } = require("snarkjs");
-
-// ERROR in plus 1? in circom etc
 
 const TEST_INPUT_VALUE_RANGE = [0, 1, 2];
 

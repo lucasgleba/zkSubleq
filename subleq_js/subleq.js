@@ -1,4 +1,5 @@
 const MerkleTree = require("fixed-merkle-tree");
+const { fit2Comp } = require("./utils");
 const { bigInt } = require("snarkjs");
 const stringifyBigInts =
   require("websnark/tools/stringifybigint").stringifyBigInts;
@@ -39,12 +40,10 @@ function subleq(pc, mTree) {
   const [addrA, addrB, posC] = ins;
   const mA = mTree._layers[0][addrA];
   const mB = mTree._layers[0][addrB];
-  let newMB;
+  let newMB = fit2Comp(mB.sub(mA));
   if (mB.lesserOrEquals(mA)) {
-    newMB = TWO_POW_M_SLOT_SIZE.sub(mB.sub(mA).mod(TWO_POW_M_SLOT_SIZE));
     pc = posC;
   } else {
-    newMB = mB.sub(mA);
     pc.add(bigInt(1));
   }
   // mTree.update(bIndex, newMB);
