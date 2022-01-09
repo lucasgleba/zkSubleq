@@ -145,10 +145,10 @@ template ValidStep(mLevels, mSlotSize) {
 
     // ******** State 1 ********
     // Internals
-    signal input pcOut; // ok
-    signal input bOut; // ok
+    // signal input pcOut; // ok
+    // signal input bOut; // ok
     // Externals
-    signal input mRoot1;
+    // signal input mRoot1;
     signal input sRoot1; // public
 
     // ******** Setup ********
@@ -172,9 +172,10 @@ template ValidStep(mLevels, mSlotSize) {
     }
 
     // ******** Assertion ********
-    step.pcOut === pcOut;
-    step.bOut === bOut;
-    step.mRoot1 === mRoot1;
+    // step.pcOut === pcOut;
+    // step.bOut === bOut;
+    // step.mRoot1 === mRoot1;
+    // sRoot1 won't be valid unless pcOut, bOut, mRoot1 also are
     step.sRoot1 === sRoot1;
 
 }

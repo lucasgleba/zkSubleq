@@ -68,9 +68,9 @@ function formatSample(data) {
     cPathElements: data.startState.C.posPath.pathElements,
     aMPathElements: data.startState.A.mPath.pathElements,
     bMPathElements: data.startState.B.mPath.pathElements,
-    pcOut: data.endState.pc,
-    bOut: data.endState.B.m,
-    mRoot1: data.endState.mRoot,
+    // pcOut: data.endState.pc,
+    // bOut: data.endState.B.m,
+    // mRoot1: data.endState.mRoot,
     sRoot1: data.endState.root,
   };
 }
