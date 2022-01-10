@@ -97,6 +97,47 @@ function formatSample(data) {
   };
 }
 
+function formatMultiSample(stepsData) {
+  const firstStep = stepsData[0];
+  const lastStep = stepsData[stepsData.length - 1];
+  const inputData = {
+    pcIn: firstStep.startState.pc,
+    mRoot0: firstStep.startState.mRoot,
+    sRoot0: firstStep.startState.root,
+    aAddr: [],
+    bAddr: [],
+    cIn: [],
+    aIn: [],
+    bIn: [],
+    aAddrPathElements: [],
+    bAddrPathElements: [],
+    cPathElements: [],
+    aMPathElements: [],
+    bMPathElements: [],
+  };
+  stepsData.forEach(function (stepData) {
+    stepData = formatSample(stepData).input;
+    inputData.aAddr.push(stepData.aAddr);
+    inputData.bAddr.push(stepData.bAddr);
+    inputData.cIn.push(stepData.cIn);
+    inputData.aIn.push(stepData.aIn);
+    inputData.bIn.push(stepData.bIn);
+    inputData.aAddrPathElements.push(stepData.aAddrPathElements);
+    inputData.bAddrPathElements.push(stepData.bAddrPathElements);
+    inputData.cPathElements.push(stepData.cPathElements);
+    inputData.aMPathElements.push(stepData.aMPathElements);
+    inputData.bMPathElements.push(stepData.bMPathElements);
+  });
+  return {
+    input: inputData,
+    internalOutput: {
+      pcOut: lastStep.endState.pc,
+      mRoot1: lastStep.endState.mRoot,
+      sRoot1: lastStep.endState.root,
+    },
+  };
+}
+
 function main() {
   const data = genSample(...process.argv.slice(2, 4));
   const formattedData = formatSample(data).input;
@@ -117,4 +158,5 @@ module.exports = {
   genSample,
   genSampleMultiStep,
   formatSample,
+  formatMultiSample,
 };
