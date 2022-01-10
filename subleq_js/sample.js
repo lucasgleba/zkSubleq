@@ -146,7 +146,7 @@ function main() {
   console.log(dataStr, ">", filepath);
 }
 
-if (!module.parent) {
+if (require.main === module) {
   main();
 }
 
