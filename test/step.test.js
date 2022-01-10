@@ -34,7 +34,7 @@ describe("step circuit", function () {
         let circuit = await getWasmTester("step", cname + ".circom");
         let data;
         for (let ii = 0; ii < N_TEST_CASES; ii++) {
-          data = sample.formatSample(sample.genSample(ii, md));
+          data = sample.formatSample(sample.genSample(ii, ss, md));
           await checkStep(data, circuit);
         }
       });
@@ -51,7 +51,7 @@ describe("step circuit", function () {
         let circuit = await getWasmTester("step", cname + ".circom");
         let data;
         for (let ii = 0; ii < N_TEST_CASES; ii++) {
-          data = sample.formatSample(sample.genSample(ii, md));
+          data = sample.formatSample(sample.genSample(ii, ss, md));
           await checkValidStep(data, circuit);
         }
       });

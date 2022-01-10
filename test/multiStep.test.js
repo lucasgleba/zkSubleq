@@ -1,5 +1,4 @@
 const path = require("path");
-// TODO: Test for failure if input is not valid
 const { getWasmTester } = require("./utils");
 const sample = require("../subleq_js/sample.js");
 
@@ -21,14 +20,14 @@ describe("multi step circuit", function () {
     );
     let data;
     for (let ii = 0; ii < N_TEST_CASES; ii++) {
-      data = sample.formatSample(sample.genSample(ii, 3));
+      data = sample.formatSample(sample.genSample(ii, 128, 3));
       await checkStep(data, circuit);
     }
   });
   it("multiStep_8_5_128", async () => {
     // path, nSteps, maxMemoryDepth
     const programPath = path.join(process.cwd(), "programs", "hw.txt");
-    const stepsData = sample.genMultiStepSample(programPath, 8, 5);
+    const stepsData = sample.genMultiStepSample(programPath, 8, 128, 5);
     const data = sample.formatMultiStepSample(stepsData);
     const inputData = Object.assign({}, data.input);
     delete inputData.sRoot1;
