@@ -6,7 +6,7 @@ const DEFAULT_SEED = 0;
 
 // WARNING: Not good randomness!
 function Random(seed) {
-  this.seed = seed || 0;
+  this.seed = seed || DEFAULT_SEED;
   this.random = function (aa, bb) {
     if (bb == undefined) {
       bb = aa;
@@ -18,9 +18,10 @@ function Random(seed) {
   };
 }
 
-function genSample(seed, memoryDepth) {
+function genSample(seed, memorySlotSize, memoryDepth) {
   seed = seed || DEFAULT_SEED;
   memoryDepth = memoryDepth || 3;
+  memorySlotSize = memorySlotSize || 128;
 
   const memorySize = 2 ** memoryDepth;
   const safeLazyGenValueP1 = memorySize - 2;
@@ -34,15 +35,22 @@ function genSample(seed, memoryDepth) {
     memory.push(random.random(safeLazyGenValueP1));
   }
 
-  const sMaker = new StateMaker(memoryDepth, 128);
+  const sMaker = new StateMaker(memoryDepth, memorySlotSize);
   const mTree = sMaker.newMTree(memory);
   const sTree = sMaker.newSTree(rawPc, mTree);
-  const subleq = new Subleq(128);
+  const subleq = new Subleq(memorySlotSize);
   return subleq.step(sTree, mTree);
 }
 
-function genMultiStepSample(programPath, nSteps, memoryDepth, maxMemoryDepth) {
+function genMultiStepSample(
+  programPath,
+  nSteps,
+  memorySlotSize,
+  memoryDepth,
+  maxMemoryDepth
+) {
   nSteps = nSteps || 1;
+  memorySlotSize = memorySlotSize || 128;
   const pc0 = 0;
 
   let memory0 = utils.readMemoryFile(programPath);
@@ -60,12 +68,12 @@ function genMultiStepSample(programPath, nSteps, memoryDepth, maxMemoryDepth) {
   }
 
   const memorySize = 2 ** memoryDepth;
-
   memory0 = utils.padMemory(memory0, memorySize);
-  const sMaker = new StateMaker(memoryDepth, 128);
+
+  const sMaker = new StateMaker(memoryDepth, memorySlotSize);
   const mTree = sMaker.newMTree(memory0);
   const sTree = sMaker.newSTree(pc0, mTree);
-  const subleq = new Subleq(128);
+  const subleq = new Subleq(memorySlotSize);
   return subleq.multiStep(sTree, mTree, nSteps);
 }
 
@@ -143,17 +151,35 @@ function formatMultiStepSample(stepsData) {
 }
 
 function main() {
-  const filepath = process.argv[5] || "sample.json";
-  const data = genMultiStepSample(...process.argv.slice(2, 5));
-  const formattedData = formatMultiStepSample(data).input;
-  // const filepath = process.argv[4] || "sample.json";
-  // const data = genSample(...process.argv.slice(2, 4));
-  // const formattedData = formatSample(data).input;
-  const dataStr = JSON.stringify(formattedData, null, 4);
   const fs = require("fs");
-  fs.writeFile(filepath, dataStr, function (err, result) {
-    if (err) console.log("error", err);
-  });
+  let formattedData;
+  const filepath = process.argv[3];
+  const mode = process.argv[2];
+  if (mode == "single") {
+    const [seed, memorySlotSize, memoryDepth] = process.argv.slice(4, 7);
+    const data = genSample(seed, memorySlotSize, memoryDepth);
+    formattedData = formatSample(data).input;
+  } else if (mode == "multi") {
+    const [programPath, nSteps, memorySlotSize, memoryDepth] =
+      process.argv.slice(4, 8);
+    const data = genMultiStepSample(
+      programPath,
+      nSteps,
+      memorySlotSize,
+      memoryDepth
+    );
+    formattedData = formatMultiStepSample(data).input;
+  } else if (mode == "help") {
+    console.log("single outputFile.json seed memorySlotSize memoryDepth");
+    console.log(
+      "multi outputFile.json programPath.txt nSteps memorySlotSize memoryDepth"
+    );
+    return;
+  } else {
+    throw "mode not valid (try node sample.js help)";
+  }
+  const dataStr = JSON.stringify(formattedData, null, 4);
+  fs.writeFileSync(filepath, dataStr);
   console.log(dataStr, ">", filepath);
 }
 

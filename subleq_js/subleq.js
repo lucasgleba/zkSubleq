@@ -34,7 +34,7 @@ function Subleq(memorySlotSize) {
     if (mB.lesserOrEquals(mA)) {
       pc = posC;
     } else {
-      pc = pc.add(BN1);
+      pc = pc.add(BI1);
     }
     let newMB = this.sub(mB, mA);
     return { insStartIndex, newPc: pc, addrA, addrB, posC, mA, mB, newMB };
