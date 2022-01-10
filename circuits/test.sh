@@ -29,28 +29,31 @@ main() {
 
     echo "running powers of tau ceremony..."
     # https://docs.circom.io/getting-started/proving-circuits/#powers-of-tau
-    echo "[ptau] phase 1"
-    date
-    if [ -e $ptau1_fn ]
-    then
-        echo "ptau file already exists. skipping..."
-    else
-        snarkjs powersoftau new bn128 $n_ptau $ptau0_fn
-        snarkjs powersoftau contribute $ptau0_fn $ptau1_fn --name="First contribution" -v -e="$(date)"
-    fi
+    # echo "[ptau] phase 1"
+    # date
+    # if [ -e $ptau1_fn ]
+    # then
+    #     echo "ptau file already exists. skipping..."
+    # else
+    #     snarkjs powersoftau new bn128 $n_ptau $ptau0_fn
+    # fi
+    # snarkjs powersoftau contribute $ptau0_fn $ptau1_fn --name="First contribution" -v -e="$(date)"
+    # snarkjs powersoftau verify $ptau1_fn
     echo "[ptau] phase 2"
     date
-    if [ -e verification_key.json ]
-    then
-        echo "verification key already exists. skipping..."
-    else
-        snarkjs groth16 setup circuit.r1cs $ptauf_fn circuit_0000.zkey || (
-        snarkjs powersoftau prepare phase2 $ptau1_fn $ptauf_fn -v &&
-        snarkjs groth16 setup circuit.r1cs $ptauf_fn circuit_0000.zkey
-    )
-        snarkjs zkey contribute circuit_0000.zkey circuit_0001.zkey --name="1st Contributor Name" -v -e="$(date)"
-        snarkjs zkey export verificationkey circuit_0001.zkey verification_key.json
-    fi
+    # if [ -e verification_key.json ]
+    # then
+    #     echo "verification key already exists. skipping..."
+    # else
+    # snarkjs groth16 setup circuit.r1cs $ptauf_fn circuit_0000.zkey || (
+    # snarkjs powersoftau prepare phase2 $ptau1_fn $ptauf_fn -v
+    # echo "verifying $ptauf_fn..."
+    # snarkjs powersoftau verify $ptauf_fn -v
+
+    snarkjs groth16 setup circuit.r1cs $ptauf_fn circuit_0000.zkey -v
+    snarkjs zkey contribute circuit_0000.zkey circuit_0001.zkey --name="1st Contributor Name" -v -e="$(date)"
+    snarkjs zkey verify circuit.r1cs $ptauf_fn circuit_0001.zkey
+    snarkjs zkey export verificationkey circuit_0001.zkey verification_key.json
     echo
 
     echo "generating proof..."

@@ -104,22 +104,6 @@ function genSampleMultiStep(seed, memoryDepth, nSteps) {
   return subleq.multiStep(sTree, mTree, nSteps);
 }
 
-function genFixedSample() {
-  return genSample(DEFAULT_SEED, 13);
-  // const rawPc = 1;
-  // const codeLen = 2; // n instructions
-  // const codeOffset = codeLen * INSTRUCTION_SIZE;
-  // const code = new Array(codeOffset).fill(0);
-  // const pcInsStartIndex = rawPc * INSTRUCTION_SIZE;
-  // code[pcInsStartIndex + 0] = codeOffset + 0; // addrA
-  // code[pcInsStartIndex + 1] = codeOffset + 1; // addrB
-  // code[pcInsStartIndex + 2] = 0; // C
-  // const data = [10, 1]; // mA, mB
-  // const mTree = subleq.genMTree(code, data);
-  // const sTree = subleq.genSTree(rawPc, mTree);
-  // return subleq.step(sTree, mTree);
-}
-
 function formatSample(data) {
   return {
     input: {
@@ -152,15 +136,15 @@ function formatSample(data) {
 }
 
 function main() {
-  const filename = "sample";
-  const fs = require("fs");
-  const data = genFixedSample();
+  const data = genSample(...process.argv.slice(2, 4));
   const formattedData = formatSample(data).input;
   const dataStr = JSON.stringify(formattedData, null, 4);
-  fs.writeFile(filename + ".json", dataStr, function (err, result) {
+  const filepath = process.argv[4] || "sample.json";
+  const fs = require("fs");
+  fs.writeFile(filepath, dataStr, function (err, result) {
     if (err) console.log("error", err);
   });
-  console.log(dataStr, `> ${filename}.json`);
+  console.log(dataStr, ">", filepath);
 }
 
 if (!module.parent) {
@@ -169,7 +153,6 @@ if (!module.parent) {
 
 module.exports = {
   genSample,
-  genFixedSample,
   genSampleMultiStep,
   formatSample,
 };
