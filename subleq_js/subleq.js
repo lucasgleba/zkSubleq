@@ -24,18 +24,25 @@ function Subleq(memorySlotSize) {
   this.subleq = (pcIn, aIn, bIn, cIn) => {
     const bOut = this.sub(bIn, aIn);
     let pcOut;
-    if (aIn.greater(bIn)) {
-      pcOut = cIn;
-    } else {
+    if (aIn.lesser(bIn)) {
       pcOut = pcIn.add(BI1);
+    } else {
+      pcOut = cIn;
     }
     return { bOut, pcOut };
   };
 
   this.getIns = (pcIn, mTree) => {
+    const memorySize = mTree._layers[0].length;
     const insAddr = pcIn.toJSNumber() * INSTRUCTION_SIZE;
+    if (insAddr + INSTRUCTION_SIZE > memorySize) {
+      throw "memory address does not exist";
+    }
     const ins = mTree._layers[0].slice(insAddr, insAddr + INSTRUCTION_SIZE);
     const [aAddr, bAddr, cIn] = ins;
+    if (aAddr >= memorySize || bAddr >= memorySize) {
+      throw "memory address does not exist";
+    }
     const aIn = mTree._layers[0][aAddr];
     const bIn = mTree._layers[0][bAddr];
     return {
