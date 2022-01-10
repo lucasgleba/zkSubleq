@@ -15,8 +15,8 @@ function toPc(pc) {
   return bigInt(pc);
 }
 
-function toMemory(code, data) {
-  return [...code, ...data].map(function (element) {
+function toMemory(memoryData) {
+  return memoryData.map(function (element) {
     if (element >= 0) {
       return bigInt(element);
     } else {
@@ -25,9 +25,9 @@ function toMemory(code, data) {
   });
 }
 
-function genMTree(code, data, memoryDepth) {
+function genMTree(memoryDepth, memoryData) {
   memoryDepth = memoryDepth || 3;
-  memory = toMemory(code, data);
+  memory = toMemory(memoryData);
   return new MerkleTree(memoryDepth, memory);
 }
 

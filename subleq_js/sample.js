@@ -26,14 +26,13 @@ function genSample(seed, memoryDepth) {
   const random = new Random(seed);
 
   const rawPc = random.random(Math.floor(safeLazyGenValueP1 / 3));
-  const code = [];
-  const data = [];
+  const memory = [];
 
   for (let ii = 0; ii < memorySize; ii++) {
-    code.push(random.random(safeLazyGenValueP1));
+    memory.push(random.random(safeLazyGenValueP1));
   }
 
-  const mTree = subleq.genMTree(code, data, memoryDepth);
+  const mTree = subleq.genMTree(memoryDepth, memory);
   const sTree = subleq.genSTree(rawPc, mTree);
 
   return subleq.step(sTree, mTree);
@@ -96,7 +95,7 @@ function genSampleMultiStep(seed, memoryDepth, nSteps) {
   // console.log(code, code.length);
   // console.log(data, data.length);
 
-  const mTree = subleq.genMTree(code, data, memoryDepth);
+  const mTree = subleq.genMTree(memoryDepth, code.concat(data));
   const sTree = subleq.genSTree(rawPc, mTree);
 
   // console.log(mTree._layers[0]);

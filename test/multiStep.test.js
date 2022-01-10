@@ -24,30 +24,7 @@ describe("multi step circuit", function () {
       await checkStep(data, circuit);
     }
   });
-  // signal input pcIn;
-  // signal input aAddr[nSteps];
-  // signal input bAddr[nSteps];
-  // signal input cIn[nSteps];
-  // signal input aIn[nSteps];
-  // signal input bIn[nSteps];
-  // // Externals: merkle proofs and roots
-  // signal input mRoot0;
-  // signal input sRoot0;
-  // signal input aAddrPathElements[nSteps][mLevels];
-  // signal input bAddrPathElements[nSteps][mLevels];
-  // signal input cPathElements[nSteps][mLevels];
-  // signal input aMPathElements[nSteps][mLevels];
-  // signal input bMPathElements[nSteps][mLevels];
-
-  // // ******** OUTPUT ********
-  // // Internals
-  // signal output pcOut;
-  // // signal output bOut;
-  // // Externals
-  // signal output mRoot1;
-  // signal output sRoot1;
   it("multiStep_8_5_32", async () => {
-    let circuit = await getWasmTester("multi_step", "multiStep_8_5_32.circom");
     // seed, memoryDepth, nSteps
     // seed, memoryDepth are hardcode inside the function at the moment
     const stepsData = sample.genSampleMultiStep(0, 5, 8);
@@ -81,6 +58,7 @@ describe("multi step circuit", function () {
       data.aMPathElements.push(stepData.aMPathElements);
       data.bMPathElements.push(stepData.bMPathElements);
     });
+    let circuit = await getWasmTester("multi_step", "multiStep_8_5_32.circom");
     const w = await circuit.calculateWitness(data, true);
     const expectedOutput = {
       pcOut: lastStep.endState.pc,
