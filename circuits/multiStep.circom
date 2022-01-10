@@ -17,8 +17,8 @@ template MultiStep(nSteps, mLevels, mSlotSize) {
     signal input aAddrPathElements[nSteps][mLevels];
     signal input bAddrPathElements[nSteps][mLevels];
     signal input cPathElements[nSteps][mLevels];
-    signal input aMPathElements[nSteps][mLevels];
-    signal input bMPathElements[nSteps][mLevels];
+    signal input aInPathElements[nSteps][mLevels];
+    signal input bInPathElements[nSteps][mLevels];
 
     // ******** OUTPUT ********
     // Internals
@@ -46,8 +46,8 @@ template MultiStep(nSteps, mLevels, mSlotSize) {
         steps[0].aAddrPathElements[ii] <== aAddrPathElements[0][ii];
         steps[0].bAddrPathElements[ii] <== bAddrPathElements[0][ii];
         steps[0].cPathElements[ii] <== cPathElements[0][ii];
-        steps[0].aMPathElements[ii] <== aMPathElements[0][ii];
-        steps[0].bMPathElements[ii] <== bMPathElements[0][ii];
+        steps[0].aInPathElements[ii] <== aInPathElements[0][ii];
+        steps[0].bInPathElements[ii] <== bInPathElements[0][ii];
     }
 
     for (var ii = 1; ii < nSteps; ii++) {
@@ -67,8 +67,8 @@ template MultiStep(nSteps, mLevels, mSlotSize) {
             steps[ii].aAddrPathElements[jj] <== aAddrPathElements[ii][jj];
             steps[ii].bAddrPathElements[jj] <== bAddrPathElements[ii][jj];
             steps[ii].cPathElements[jj] <== cPathElements[ii][jj];
-            steps[ii].aMPathElements[jj] <== aMPathElements[ii][jj];
-            steps[ii].bMPathElements[jj] <== bMPathElements[ii][jj];
+            steps[ii].aInPathElements[jj] <== aInPathElements[ii][jj];
+            steps[ii].bInPathElements[jj] <== bInPathElements[ii][jj];
         }
     }
 
@@ -94,8 +94,8 @@ template ValidMultiStep(nSteps, mLevels, mSlotSize) {
     signal input aAddrPathElements[nSteps][mLevels];
     signal input bAddrPathElements[nSteps][mLevels];
     signal input cPathElements[nSteps][mLevels];
-    signal input aMPathElements[nSteps][mLevels];
-    signal input bMPathElements[nSteps][mLevels];
+    signal input aInPathElements[nSteps][mLevels];
+    signal input bInPathElements[nSteps][mLevels];
 
     // ******** State 1 ********
     // Internals
@@ -123,8 +123,8 @@ template ValidMultiStep(nSteps, mLevels, mSlotSize) {
             multiStep.aAddrPathElements[ii][jj] <== aAddrPathElements[ii][jj];
             multiStep.bAddrPathElements[ii][jj] <== bAddrPathElements[ii][jj];
             multiStep.cPathElements[ii][jj] <== cPathElements[ii][jj];
-            multiStep.aMPathElements[ii][jj] <== aMPathElements[ii][jj];
-            multiStep.bMPathElements[ii][jj] <== bMPathElements[ii][jj];
+            multiStep.aInPathElements[ii][jj] <== aInPathElements[ii][jj];
+            multiStep.bInPathElements[ii][jj] <== bInPathElements[ii][jj];
         }
     }
 

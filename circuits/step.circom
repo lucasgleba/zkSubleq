@@ -25,8 +25,8 @@ template Step(mLevels, mSlotSize) {
     signal input aAddrPathElements[mLevels]; // ok
     signal input bAddrPathElements[mLevels]; // ok
     signal input cPathElements[mLevels]; // ok
-    signal input aMPathElements[mLevels]; // ok
-    signal input bMPathElements[mLevels]; // ok
+    signal input aInPathElements[mLevels]; // ok
+    signal input bInPathElements[mLevels]; // ok
 
     // ******** OUTPUT ********
     // Internals
@@ -54,7 +54,7 @@ template Step(mLevels, mSlotSize) {
     m1Tree.leaf <== bOut;
     for (var ii = 0; ii < mLevels; ii++) {
         m1Tree.pathIndices[ii] <== bAddrBitifier.out[ii];
-        m1Tree.pathElements[ii] <== bMPathElements[ii];
+        m1Tree.pathElements[ii] <== bInPathElements[ii];
     }
     mRoot1 <== m1Tree.root;
     // Set sRoot1
@@ -120,9 +120,9 @@ template Step(mLevels, mSlotSize) {
         cInMerkleChecker.pathElements[ii] <== cPathElements[ii];
         // Set proof[ii] for aIn, bIn
         aInMerkleChecker.pathIndices[ii] <== aAddrBitifier.out[ii];
-        aInMerkleChecker.pathElements[ii] <== aMPathElements[ii];
+        aInMerkleChecker.pathElements[ii] <== aInPathElements[ii];
         bInMerkleChecker.pathIndices[ii] <== bAddrBitifier.out[ii];
-        bInMerkleChecker.pathElements[ii] <== bMPathElements[ii];
+        bInMerkleChecker.pathElements[ii] <== bInPathElements[ii];
     }
 }
 
@@ -141,8 +141,8 @@ template ValidStep(mLevels, mSlotSize) {
     signal input aAddrPathElements[mLevels];
     signal input bAddrPathElements[mLevels];
     signal input cPathElements[mLevels];
-    signal input aMPathElements[mLevels];
-    signal input bMPathElements[mLevels];
+    signal input aInPathElements[mLevels];
+    signal input bInPathElements[mLevels];
 
     // ******** State 1 ********
     // Internals
@@ -168,8 +168,8 @@ template ValidStep(mLevels, mSlotSize) {
         step.aAddrPathElements[ii] <== aAddrPathElements[ii];
         step.bAddrPathElements[ii] <== bAddrPathElements[ii];
         step.cPathElements[ii] <== cPathElements[ii];
-        step.aMPathElements[ii] <== aMPathElements[ii];
-        step.bMPathElements[ii] <== bMPathElements[ii];
+        step.aInPathElements[ii] <== aInPathElements[ii];
+        step.bInPathElements[ii] <== bInPathElements[ii];
     }
 
     // ******** Assertion ********

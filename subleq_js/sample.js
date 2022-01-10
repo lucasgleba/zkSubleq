@@ -91,8 +91,8 @@ function formatSample(data) {
       aAddrPathElements: data.startState.A.addrPath.pathElements,
       bAddrPathElements: data.startState.B.addrPath.pathElements,
       cPathElements: data.startState.C.posPath.pathElements,
-      aMPathElements: data.startState.A.mPath.pathElements,
-      bMPathElements: data.startState.B.mPath.pathElements,
+      aInPathElements: data.startState.A.mPath.pathElements,
+      bInPathElements: data.startState.B.mPath.pathElements,
       sRoot1: data.endState.root,
     },
     internalOutput: {
@@ -124,8 +124,8 @@ function formatMultiStepSample(stepsData) {
     aAddrPathElements: [],
     bAddrPathElements: [],
     cPathElements: [],
-    aMPathElements: [],
-    bMPathElements: [],
+    aInPathElements: [],
+    bInPathElements: [],
   };
   stepsData.forEach(function (stepData) {
     stepData = formatSample(stepData).input;
@@ -137,8 +137,8 @@ function formatMultiStepSample(stepsData) {
     inputData.aAddrPathElements.push(stepData.aAddrPathElements);
     inputData.bAddrPathElements.push(stepData.bAddrPathElements);
     inputData.cPathElements.push(stepData.cPathElements);
-    inputData.aMPathElements.push(stepData.aMPathElements);
-    inputData.bMPathElements.push(stepData.bMPathElements);
+    inputData.aInPathElements.push(stepData.aInPathElements);
+    inputData.bInPathElements.push(stepData.bInPathElements);
   });
   return {
     input: inputData,
