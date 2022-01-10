@@ -1,3 +1,4 @@
+const path = require("path");
 const sample = require("./sample");
-
-console.log(sample.genSampleMultiStep(0, 5, 8));
+const programPath = path.join(process.cwd(), "programs", "hw.txt");
+console.log(sample.genSampleMultiStep(programPath, 8, 5));

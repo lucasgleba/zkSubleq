@@ -79,8 +79,7 @@ function main() {
   try {
     rawMemory0 = fs.readFileSync(filepath, "utf8");
   } catch (err) {
-    console.error(err);
-    return;
+    throw err;
   }
   const memory0 = readMemory(rawMemory0);
   const nSteps = process.argv[3];
@@ -97,3 +96,8 @@ function main() {
 if (require.main === module) {
   main();
 }
+module.exports = {
+  run,
+  padMemory,
+  readMemory,
+};

@@ -1,4 +1,6 @@
+const fs = require("fs");
 const subleq = require("./subleq");
+const run = require("./run");
 
 const DEFAULT_SEED = 0;
 
@@ -38,68 +40,29 @@ function genSample(seed, memoryDepth) {
   return subleq.step(sTree, mTree);
 }
 
-function genSampleMultiStep(seed, memoryDepth, nSteps) {
-  // seed = seed || DEFAULT_SEED;
-  // memoryDepth = memoryDepth || 3;
+function genSampleMultiStep(programPath, nSteps, maxMemoryDepth) {
+  nSteps = nSteps || 1;
+  const pc0 = 0;
 
-  // const memorySize = 2 ** memoryDepth;
+  let rawMemory0;
+  try {
+    rawMemory0 = fs.readFileSync(programPath, "utf8");
+  } catch (err) {
+    throw err;
+    return;
+  }
 
-  memoryDepth = 5;
+  let memory0 = run.readMemory(rawMemory0);
+  const memoryDepth = Math.ceil(Math.log(memory0.length) / Math.LN2);
   const memorySize = 2 ** memoryDepth;
 
-  const rawPc = 0;
+  if (maxMemoryDepth != undefined && memoryDepth > maxMemoryDepth) {
+    throw "memoryDepth > maxMemoryDepth";
+  }
 
-  const codeSize = 25;
-  const data = new Array(memorySize - codeSize).fill(0);
-  const Z = codeSize;
-  const O = Z + 1;
-  const [A, B, H, W, X] = [O + 1, O + 2, O + 3, O + 4, O + 5];
-  data[Z - Z] = 0;
-  data[O - Z] = 1;
-  data[A - Z] = 0;
-  data[B - Z] = 0;
-  data[H - Z] = 72;
-  data[W - Z] = 87;
-  // Set A, B to 72, 87 (ASCII "HW")
-  let code = [
-    // Set m[A] = m[H]
-    H,
-    X,
-    1, // 0
-    X,
-    A,
-    2, // 1
-    // Reset m[X] = 0
-    X,
-    X,
-    3, // 2
-    // Set m[B] = m[W]
-    W,
-    X,
-    4, // 3
-    X,
-    B,
-    5, // 4
-    // Reset m[X] = 0
-    X,
-    X,
-    6, // 5
-    // Done
-    Z,
-    Z,
-    6, // 6
-  ];
-  code = code.concat(new Array(codeSize - code.length).fill(0));
-
-  // console.log(memoryDepth);
-  // console.log(code, code.length);
-  // console.log(data, data.length);
-
-  const mTree = subleq.genMTree(memoryDepth, code.concat(data));
-  const sTree = subleq.genSTree(rawPc, mTree);
-
-  // console.log(mTree._layers[0]);
-
+  memory0 = run.padMemory(memory0, memorySize);
+  const mTree = subleq.genMTree(memoryDepth, memory0);
+  const sTree = subleq.genSTree(pc0, mTree);
   return subleq.multiStep(sTree, mTree, nSteps);
 }
 

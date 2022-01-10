@@ -56,7 +56,7 @@ function step(sTree, mTree) {
   const [pc, mRoot] = sTree.elements();
 
   if (mTree.root() != mRoot) {
-    return false;
+    throw "mTree.root() != mRoot";
   }
 
   let { insStartIndex, newPc, addrA, addrB, posC, mA, mB, newMB } = subleq(
