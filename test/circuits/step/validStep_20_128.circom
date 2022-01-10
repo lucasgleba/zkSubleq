@@ -2,4 +2,4 @@ pragma circom 2.0.2;
 
 include "../../../circuits/step.circom";
 
-component main {public [sRoot0]} = Step(4, 32);
+component main {public [sRoot0, sRoot1]} = ValidStep(20, 128);

@@ -11,7 +11,7 @@
 // const assert = chai.assert;
 
 const { getWasmTester } = require("./utils");
-const { toMemorySlot } = require("../subleq_js/subleq");
+const { sub } = require("../subleq_js/subleq");
 const { bigInt } = require("snarkjs");
 
 const TEST_INPUT_VALUE_RANGE = [0, 1, 2];
@@ -19,7 +19,7 @@ const TEST_INPUT_VALUE_RANGE = [0, 1, 2];
 async function checkSubleq(pcIn, aIn, bIn, cIn, circuit) {
   const input = { pcIn, aIn, bIn, cIn };
   const w = await circuit.calculateWitness(input, true);
-  const bOut = toMemorySlot(bIn - aIn);
+  const bOut = sub(bIn, aIn);
   const pcOut = bOut.lesserOrEquals(bigInt.zero) ? cIn : pcIn + 1;
   const expectedOutput = { pcOut, bOut };
   await circuit.assertOut(w, expectedOutput);
@@ -27,8 +27,8 @@ async function checkSubleq(pcIn, aIn, bIn, cIn, circuit) {
 
 describe("subleq circuit", function () {
   this.timeout(100000);
-  it("subleq_32", async () => {
-    let circuit = await getWasmTester("lib", "subleq_32.circom");
+  it("subleq_128", async () => {
+    let circuit = await getWasmTester("lib", "subleq_128.circom");
     await TEST_INPUT_VALUE_RANGE.forEach(async (pcIn) => {
       await TEST_INPUT_VALUE_RANGE.forEach(async (aIn) => {
         await TEST_INPUT_VALUE_RANGE.forEach(async (bIn) => {

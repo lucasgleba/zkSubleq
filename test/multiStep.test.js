@@ -14,10 +14,10 @@ async function checkStep(data, circuit) {
 
 describe("multi step circuit", function () {
   this.timeout(100000);
-  it("validMultiStep_1_3_32", async () => {
+  it("validMultiStep_1_3_128", async () => {
     let circuit = await getWasmTester(
       "multi_step",
-      "validMultiStep_1_3_32.circom"
+      "validMultiStep_1_3_128.circom"
     );
     let data;
     for (let ii = 0; ii < N_TEST_CASES; ii++) {
@@ -25,14 +25,14 @@ describe("multi step circuit", function () {
       await checkStep(data, circuit);
     }
   });
-  it("multiStep_8_5_32", async () => {
+  it("multiStep_8_5_128", async () => {
     // path, nSteps, maxMemoryDepth
     const programPath = path.join(process.cwd(), "programs", "hw.txt");
     const stepsData = sample.genMultiStepSample(programPath, 8, 5);
     const data = sample.formatMultiStepSample(stepsData);
     const inputData = Object.assign({}, data.input);
     delete inputData.sRoot1;
-    let circuit = await getWasmTester("multi_step", "multiStep_8_5_32.circom");
+    let circuit = await getWasmTester("multi_step", "multiStep_8_5_128.circom");
     const w = await circuit.calculateWitness(inputData, true);
     await circuit.assertOut(w, data.internalOutput);
   });

@@ -22,11 +22,11 @@ describe("step circuit", function () {
   this.timeout(100000);
   describe("step io", function () {
     [
-      [3, 32],
-      // [4, 32],
-      [8, 32],
-      // [16, 32],
-      // [20, 32],
+      [3, 128],
+      // [4, 128],
+      [8, 128],
+      // [16, 128],
+      // [20, 128],
     ].forEach(function (params) {
       const [md, ss] = params;
       const cname = `step_${md}_${ss}`;
@@ -42,8 +42,8 @@ describe("step circuit", function () {
   });
   describe("valid step constrain", function () {
     [
-      [3, 32],
-      // [20, 32],
+      [3, 128],
+      // [20, 128],
     ].forEach(function (params) {
       const [md, ss] = params;
       const cname = `validStep_${md}_${ss}`;

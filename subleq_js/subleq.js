@@ -7,13 +7,15 @@ const stringifyBigInts =
 const BI1 = bigInt(1);
 const BI2 = bigInt(2);
 
+// TODO: make this an object
+
 const INSTRUCTION_SIZE = 3;
 const MEMORY_SLOT_SIZE = 128;
 const TWO_POW_M_SLOT_SIZE = BI2.pow(bigInt(MEMORY_SLOT_SIZE));
 const MIN_SLOT_VALUE = TWO_POW_M_SLOT_SIZE.div(BI2).neg();
 const MAX_SLOT_VALUE = TWO_POW_M_SLOT_SIZE.div(BI2).sub(BI1);
 
-function toMemorySlot(value) {
+function toTwosComp(value) {
   value = bigInt(value);
   if (value.isNegative()) {
     if (value.lesser(MIN_SLOT_VALUE)) {
@@ -28,13 +30,23 @@ function toMemorySlot(value) {
   }
 }
 
+// aa, bb are positive bigInts between 0 and TWO_POW_M_SLOT_SIZE - 1 inclusive;
+function sub(aa, bb) {
+  aa = aa.sub(bb).mod(TWO_POW_M_SLOT_SIZE);
+  if (aa.isNegative()) {
+    return TWO_POW_M_SLOT_SIZE.add(aa);
+  } else {
+    return aa;
+  }
+}
+
 function toPc(pc) {
   return bigInt(pc);
 }
 
 function toMemory(memoryData) {
   return memoryData.map(function (element) {
-    return toMemorySlot(element);
+    return toTwosComp(element);
   });
 }
 
@@ -55,13 +67,12 @@ function subleq(pc, mTree) {
   const [addrA, addrB, posC] = ins;
   const mA = mTree._layers[0][addrA];
   const mB = mTree._layers[0][addrB];
-  let newMB = toMemorySlot(mB.sub(mA));
   if (mB.lesserOrEquals(mA)) {
     pc = posC;
   } else {
     pc = pc.add(bigInt(1));
   }
-  // mTree.update(bIndex, newMB);
+  let newMB = sub(mB, mA);
   return { insStartIndex, newPc: pc, addrA, addrB, posC, mA, mB, newMB };
 }
 
@@ -132,7 +143,7 @@ function multiStep(sTree, mTree, nSteps) {
 }
 
 module.exports = {
-  toMemorySlot,
+  sub,
   genMTree,
   genSTree,
   subleq,
