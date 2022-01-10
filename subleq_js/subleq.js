@@ -15,8 +15,8 @@ const TWO_POW_M_SLOT_SIZE = BI2.pow(bigInt(MEMORY_SLOT_SIZE));
 const MIN_SLOT_VALUE = TWO_POW_M_SLOT_SIZE.div(BI2).neg();
 const MAX_SLOT_VALUE = TWO_POW_M_SLOT_SIZE.div(BI2).sub(BI1);
 
+// value is bigInt, pos or neg
 function toTwosComp(value) {
-  value = bigInt(value);
   if (value.isNegative()) {
     if (value.lesser(MIN_SLOT_VALUE)) {
       throw "value < MIN_SLOT_VALUE";
@@ -46,7 +46,7 @@ function toPc(pc) {
 
 function toMemory(memoryData) {
   return memoryData.map(function (element) {
-    return toTwosComp(element);
+    return toTwosComp(bigInt(element));
   });
 }
 
@@ -70,7 +70,7 @@ function subleq(pc, mTree) {
   if (mB.lesserOrEquals(mA)) {
     pc = posC;
   } else {
-    pc = pc.add(bigInt(1));
+    pc = pc.add(BN1);
   }
   let newMB = sub(mB, mA);
   return { insStartIndex, newPc: pc, addrA, addrB, posC, mA, mB, newMB };
