@@ -1,6 +1,6 @@
-const fs = require("fs");
-const subleq = require("./subleq");
-const run = require("./run");
+const Subleq = require("./subleq");
+const StateMaker = require("./state");
+const utils = require("./utils");
 
 const DEFAULT_SEED = 0;
 
@@ -27,16 +27,17 @@ function genSample(seed, memoryDepth) {
 
   const random = new Random(seed);
 
-  const rawPc = random.random(Math.floor(safeLazyGenValueP1 / 3));
+  const rawPc = random.random(Math.floor(safeLazyGenValueP1 / 3)); // 3 == INSTRUCTION_SIZE
   const memory = [];
 
   for (let ii = 0; ii < memorySize; ii++) {
     memory.push(random.random(safeLazyGenValueP1));
   }
 
-  const mTree = subleq.genMTree(memoryDepth, memory);
-  const sTree = subleq.genSTree(rawPc, mTree);
-
+  const sMaker = new StateMaker(memoryDepth, 128);
+  const mTree = sMaker.newMTree(memory);
+  const sTree = sMaker.newSTree(rawPc, mTree);
+  const subleq = new Subleq(128);
   return subleq.step(sTree, mTree);
 }
 
@@ -44,15 +45,7 @@ function genMultiStepSample(programPath, nSteps, memoryDepth, maxMemoryDepth) {
   nSteps = nSteps || 1;
   const pc0 = 0;
 
-  let rawMemory0;
-  try {
-    rawMemory0 = fs.readFileSync(programPath, "utf8");
-  } catch (err) {
-    throw err;
-    return;
-  }
-
-  let memory0 = run.readMemory(rawMemory0);
+  let memory0 = utils.readMemoryFile(programPath);
   const minReqMemoryDepth = Math.ceil(Math.log(memory0.length) / Math.LN2);
 
   if (memoryDepth != undefined) {
@@ -62,16 +55,17 @@ function genMultiStepSample(programPath, nSteps, memoryDepth, maxMemoryDepth) {
   } else {
     memoryDepth = minReqMemoryDepth;
   }
-
   if (maxMemoryDepth != undefined && memoryDepth > maxMemoryDepth) {
     throw "memoryDepth > maxMemoryDepth";
   }
 
   const memorySize = 2 ** memoryDepth;
 
-  memory0 = run.padMemory(memory0, memorySize);
-  const mTree = subleq.genMTree(memoryDepth, memory0);
-  const sTree = subleq.genSTree(pc0, mTree);
+  memory0 = utils.padMemory(memory0, memorySize);
+  const sMaker = new StateMaker(memoryDepth, 128);
+  const mTree = sMaker.newMTree(memory0);
+  const sTree = sMaker.newSTree(pc0, mTree);
+  const subleq = new Subleq(128);
   return subleq.multiStep(sTree, mTree, nSteps);
 }
 
