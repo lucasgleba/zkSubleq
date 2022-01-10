@@ -28,10 +28,12 @@ describe("multi step circuit", function () {
   it("multiStep_8_5_32", async () => {
     // path, nSteps, maxMemoryDepth
     const programPath = path.join(process.cwd(), "programs", "hw.txt");
-    const stepsData = sample.genSampleMultiStep(programPath, 8, 5);
-    const data = sample.formatMultiSample(stepsData);
+    const stepsData = sample.genMultiStepSample(programPath, 8, 5);
+    const data = sample.formatMultiStepSample(stepsData);
+    const inputData = Object.assign({}, data.input);
+    delete inputData.sRoot1;
     let circuit = await getWasmTester("multi_step", "multiStep_8_5_32.circom");
-    const w = await circuit.calculateWitness(data.input, true);
+    const w = await circuit.calculateWitness(inputData, true);
     await circuit.assertOut(w, data.internalOutput);
   });
 });

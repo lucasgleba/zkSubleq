@@ -40,7 +40,7 @@ function genSample(seed, memoryDepth) {
   return subleq.step(sTree, mTree);
 }
 
-function genSampleMultiStep(programPath, nSteps, maxMemoryDepth) {
+function genMultiStepSample(programPath, nSteps, maxMemoryDepth) {
   nSteps = nSteps || 1;
   const pc0 = 0;
 
@@ -97,13 +97,14 @@ function formatSample(data) {
   };
 }
 
-function formatMultiSample(stepsData) {
+function formatMultiStepSample(stepsData) {
   const firstStep = stepsData[0];
   const lastStep = stepsData[stepsData.length - 1];
   const inputData = {
     pcIn: firstStep.startState.pc,
     mRoot0: firstStep.startState.mRoot,
     sRoot0: firstStep.startState.root,
+    sRoot1: lastStep.endState.root,
     aAddr: [],
     bAddr: [],
     cIn: [],
@@ -139,10 +140,13 @@ function formatMultiSample(stepsData) {
 }
 
 function main() {
-  const data = genSample(...process.argv.slice(2, 4));
-  const formattedData = formatSample(data).input;
+  const filepath = process.argv[5] || "sample.json";
+  const data = genMultiStepSample(...process.argv.slice(2, 5));
+  const formattedData = formatMultiStepSample(data).input;
+  // const filepath = process.argv[4] || "sample.json";
+  // const data = genSample(...process.argv.slice(2, 4));
+  // const formattedData = formatSample(data).input;
   const dataStr = JSON.stringify(formattedData, null, 4);
-  const filepath = process.argv[4] || "sample.json";
   const fs = require("fs");
   fs.writeFile(filepath, dataStr, function (err, result) {
     if (err) console.log("error", err);
@@ -156,7 +160,7 @@ if (require.main === module) {
 
 module.exports = {
   genSample,
-  genSampleMultiStep,
+  genMultiStepSample,
   formatSample,
-  formatMultiSample,
+  formatMultiStepSample,
 };
