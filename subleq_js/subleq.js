@@ -11,82 +11,90 @@ function Subleq(memorySlotSize) {
   this.MEMORY_SLOT_SIZE = bigInt(memorySlotSize);
   this.TWO_POW_M_SLOT_SIZE = BI2.pow(this.MEMORY_SLOT_SIZE);
 
-  // aa, bb are positive bigInts between 0 and TWO_POW_M_SLOT_SIZE - 1 inclusive;
-  this.sub = (aa, bb) => {
-    aa = aa.sub(bb).mod(this.TWO_POW_M_SLOT_SIZE);
-    if (aa.isNegative()) {
-      return this.TWO_POW_M_SLOT_SIZE.add(aa);
+  // bIn, aIn are positive bigInts between 0 and TWO_POW_M_SLOT_SIZE - 1 inclusive;
+  this.sub = (bIn, aIn) => {
+    bIn = bIn.sub(aIn).mod(this.TWO_POW_M_SLOT_SIZE);
+    if (bIn.isNegative()) {
+      return this.TWO_POW_M_SLOT_SIZE.add(bIn);
     } else {
-      return aa;
+      return bIn;
     }
   };
 
-  // TODO: split this
-  this.subleq = (pc, mTree) => {
-    const insStartIndex = pc.toJSNumber() * INSTRUCTION_SIZE;
-    const ins = mTree._layers[0].slice(
-      insStartIndex,
-      insStartIndex + INSTRUCTION_SIZE
-    );
-    const [addrA, addrB, posC] = ins;
-    const mA = mTree._layers[0][addrA];
-    const mB = mTree._layers[0][addrB];
-    if (mB.lesserOrEquals(mA)) {
-      pc = posC;
+  this.subleq = (pcIn, aIn, bIn, cIn) => {
+    const bOut = this.sub(bIn, aIn);
+    let pcOut;
+    if (aIn.greater(bIn)) {
+      pcOut = cIn;
     } else {
-      pc = pc.add(BI1);
+      pcOut = pcIn.add(BI1);
     }
-    let newMB = this.sub(mB, mA);
-    return { insStartIndex, newPc: pc, addrA, addrB, posC, mA, mB, newMB };
+    return { bOut, pcOut };
+  };
+
+  this.getIns = (pcIn, mTree) => {
+    const insAddr = pcIn.toJSNumber() * INSTRUCTION_SIZE;
+    const ins = mTree._layers[0].slice(insAddr, insAddr + INSTRUCTION_SIZE);
+    const [aAddr, bAddr, cIn] = ins;
+    const aIn = mTree._layers[0][aAddr];
+    const bIn = mTree._layers[0][bAddr];
+    return {
+      insAddr,
+      aAddr,
+      bAddr,
+      cIn,
+      aIn,
+      bIn,
+    };
   };
 
   this.step = (sTree, mTree) => {
-    const [pc, mRoot] = sTree.elements();
+    const [pcIn, mRoot] = sTree.elements();
 
     if (mTree.root() != mRoot) {
       throw "mTree.root() != mRoot";
     }
 
-    let { insStartIndex, newPc, addrA, addrB, posC, mA, mB, newMB } =
-      this.subleq(pc, mTree);
+    const { insAddr, aAddr, bAddr, cIn, aIn, bIn } = this.getIns(pcIn, mTree);
+    const { bOut, pcOut } = this.subleq(pcIn, aIn, bIn, cIn);
 
     const A = {
-      addr: addrA,
-      m: mA,
-      addrPath: mTree.path(insStartIndex + 0),
-      mPath: mTree.path(addrA.toJSNumber()),
+      addr: aAddr,
+      m: aIn,
+      addrPath: mTree.path(insAddr + 0),
+      mPath: mTree.path(aAddr.toJSNumber()),
     };
     const B = {
-      addr: addrB,
-      m: mB,
-      addrPath: mTree.path(insStartIndex + 1),
-      mPath: mTree.path(addrB.toJSNumber()),
+      addr: bAddr,
+      m: bIn,
+      addrPath: mTree.path(insAddr + 1),
+      mPath: mTree.path(bAddr.toJSNumber()),
     };
 
     const C = {
-      pos: posC,
-      posPath: mTree.path(insStartIndex + 2),
+      pos: cIn,
+      posPath: mTree.path(insAddr + 2),
     };
 
     const startState = {
       root: sTree.root(),
       mRoot: mRoot,
-      pc: pc,
+      pc: pcIn,
       A: A,
       B: B,
       C: C,
     };
 
-    mTree.update(addrB.toJSNumber(), newMB);
-    sTree.update(0, newPc);
+    mTree.update(bAddr.toJSNumber(), bOut);
+    sTree.update(0, pcOut);
     sTree.update(1, mTree.root());
 
     const endState = {
       root: sTree.root(),
       mRoot: mTree.root(),
-      pc: newPc,
+      pc: pcOut,
       B: {
-        m: newMB,
+        m: bOut,
       },
     };
 
