@@ -1,15 +1,32 @@
 // TODO: Improve naming
 const MerkleTree = require("fixed-merkle-tree");
-const { fit2Comp } = require("./utils");
 const { bigInt } = require("snarkjs");
 const stringifyBigInts =
   require("websnark/tools/stringifybigint").stringifyBigInts;
 
-// const MEMORY_DEPTH = 3;
-// const MEMORY_SIZE = 2 ** MEMORY_DEPTH;
+const BI1 = bigInt(1);
+const BI2 = bigInt(2);
+
 const INSTRUCTION_SIZE = 3;
-const MEMORY_SLOT_SIZE = 32;
-const TWO_POW_M_SLOT_SIZE = bigInt(2).pow(bigInt(MEMORY_SLOT_SIZE));
+const MEMORY_SLOT_SIZE = 128;
+const TWO_POW_M_SLOT_SIZE = BI2.pow(bigInt(MEMORY_SLOT_SIZE));
+const MIN_SLOT_VALUE = TWO_POW_M_SLOT_SIZE.div(BI2).neg();
+const MAX_SLOT_VALUE = TWO_POW_M_SLOT_SIZE.div(BI2).sub(BI1);
+
+function toMemorySlot(value) {
+  value = bigInt(value);
+  if (value.isNegative()) {
+    if (value.lesser(MIN_SLOT_VALUE)) {
+      throw "value < MIN_SLOT_VALUE";
+    }
+    return TWO_POW_M_SLOT_SIZE.add(value);
+  } else {
+    if (value.greater(MAX_SLOT_VALUE)) {
+      throw "value > MAX_SLOT_VALUE";
+    }
+    return value;
+  }
+}
 
 function toPc(pc) {
   return bigInt(pc);
@@ -17,11 +34,7 @@ function toPc(pc) {
 
 function toMemory(memoryData) {
   return memoryData.map(function (element) {
-    if (element >= 0) {
-      return bigInt(element);
-    } else {
-      return TWO_POW_M_SLOT_SIZE.sub(bigInt(Math.abs(element)));
-    }
+    return toMemorySlot(element);
   });
 }
 
@@ -42,7 +55,7 @@ function subleq(pc, mTree) {
   const [addrA, addrB, posC] = ins;
   const mA = mTree._layers[0][addrA];
   const mB = mTree._layers[0][addrB];
-  let newMB = fit2Comp(mB.sub(mA));
+  let newMB = toMemorySlot(mB.sub(mA));
   if (mB.lesserOrEquals(mA)) {
     pc = posC;
   } else {
@@ -115,18 +128,11 @@ function multiStep(sTree, mTree, nSteps) {
   for (let ii = 0; ii < nSteps; ii++) {
     states.push(step(sTree, mTree));
   }
-  // console.log(sTree._layers[0]);
-  // console.log(mTree._layers[0].slice(0, 25));
-  // console.log(mTree._layers[0].slice(25, 32));
   return states;
 }
 
 module.exports = {
-  constants: {
-    INSTRUCTION_SIZE,
-    MEMORY_SLOT_SIZE,
-    TWO_POW_M_SLOT_SIZE,
-  },
+  toMemorySlot,
   genMTree,
   genSTree,
   subleq,

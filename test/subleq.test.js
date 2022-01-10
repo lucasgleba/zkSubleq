@@ -11,7 +11,7 @@
 // const assert = chai.assert;
 
 const { getWasmTester } = require("./utils");
-const { fit2Comp } = require("../subleq_js/utils");
+const { toMemorySlot } = require("../subleq_js/subleq");
 const { bigInt } = require("snarkjs");
 
 const TEST_INPUT_VALUE_RANGE = [0, 1, 2];
@@ -19,7 +19,7 @@ const TEST_INPUT_VALUE_RANGE = [0, 1, 2];
 async function checkSubleq(pcIn, aIn, bIn, cIn, circuit) {
   const input = { pcIn, aIn, bIn, cIn };
   const w = await circuit.calculateWitness(input, true);
-  const bOut = fit2Comp(bIn - aIn);
+  const bOut = toMemorySlot(bIn - aIn);
   const pcOut = bOut.lesserOrEquals(bigInt.zero) ? cIn : pcIn + 1;
   const expectedOutput = { pcOut, bOut };
   await circuit.assertOut(w, expectedOutput);

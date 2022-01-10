@@ -4,7 +4,7 @@ include "../../node_modules/circomlib/circuits/comparators.circom";
 include "../../node_modules/circomlib/circuits/gates.circom";
 include "../../node_modules/circomlib/circuits/mux1.circom";
 
-template Subleq(n) {
+template Subleq(valueSize) {
 
     // assert(n <= 252);
 
@@ -16,12 +16,12 @@ template Subleq(n) {
     signal output bOut;
 
     signal bLTa;
-    component bLTater = LessThan(n);
+    component bLTater = LessThan(valueSize);
     bLTater.in[0] <== bIn;
     bLTater.in[1] <== aIn;
     bLTa <== bLTater.out;
 
-    var mod = 2 ** n;
+    var mod = 2 ** valueSize;
 
     bOut <==  mod * bLTa + bIn - aIn;
 
