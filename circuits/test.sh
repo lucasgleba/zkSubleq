@@ -52,7 +52,7 @@ main() {
 
     snarkjs groth16 setup circuit.r1cs $ptauf_fn circuit_0000.zkey -v
     snarkjs zkey contribute circuit_0000.zkey circuit_0001.zkey --name="1st Contributor Name" -v -e="$(date)"
-    snarkjs zkey verify circuit.r1cs $ptauf_fn circuit_0001.zkey
+    # snarkjs zkey verify circuit.r1cs $ptauf_fn circuit_0001.zkey
     snarkjs zkey export verificationkey circuit_0001.zkey verification_key.json
     echo
 

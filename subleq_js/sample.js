@@ -40,7 +40,7 @@ function genSample(seed, memoryDepth) {
   return subleq.step(sTree, mTree);
 }
 
-function genMultiStepSample(programPath, nSteps, maxMemoryDepth) {
+function genMultiStepSample(programPath, nSteps, memoryDepth, maxMemoryDepth) {
   nSteps = nSteps || 1;
   const pc0 = 0;
 
@@ -53,12 +53,21 @@ function genMultiStepSample(programPath, nSteps, maxMemoryDepth) {
   }
 
   let memory0 = run.readMemory(rawMemory0);
-  const memoryDepth = Math.ceil(Math.log(memory0.length) / Math.LN2);
-  const memorySize = 2 ** memoryDepth;
+  const minReqMemoryDepth = Math.ceil(Math.log(memory0.length) / Math.LN2);
+
+  if (memoryDepth != undefined) {
+    if (minReqMemoryDepth > memoryDepth) {
+      throw "minReqMemoryDepth > memoryDepth";
+    }
+  } else {
+    memoryDepth = minReqMemoryDepth;
+  }
 
   if (maxMemoryDepth != undefined && memoryDepth > maxMemoryDepth) {
     throw "memoryDepth > maxMemoryDepth";
   }
+
+  const memorySize = 2 ** memoryDepth;
 
   memory0 = run.padMemory(memory0, memorySize);
   const mTree = subleq.genMTree(memoryDepth, memory0);

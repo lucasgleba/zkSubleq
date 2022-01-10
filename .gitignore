@@ -3,5 +3,6 @@
 node_modules
 
 circuits/test/**/build
+circuits/test/**/history
 *.ptau
 circuits/test/ptau
