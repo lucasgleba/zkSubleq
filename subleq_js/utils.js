@@ -31,19 +31,17 @@ function strToMemory(rawMemory) {
     }
     memory = memory.concat(line);
   });
-  // console.log(memory);
   return memory;
 }
 
 function readMemoryFile(filepath) {
-  let rawMemory0;
+  let rawMemory;
   try {
-    rawMemory0 = fs.readFileSync(filepath, "utf8");
+    rawMemory = fs.readFileSync(filepath, "utf8");
   } catch (err) {
     throw err;
   }
-  let memory0 = strToMemory(rawMemory0);
-  return memory0;
+  return strToMemory(rawMemory);
 }
 
 module.exports = {
