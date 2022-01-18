@@ -1,7 +1,7 @@
 /**
  * runs the vm in js
- * use: node run.js <filepath> <nSteps> <memorySlotSize> <asciiSlots>
- * > node subleq_js/run.js programs/hw.txt 8 32 27,28
+ * use: node run.js <programPath> <nSteps> <memorySlotSize> <asciiSlots>
+ * > node subleq_js/run.js programs/hw.txt 8 8 27,28
  * ...
  * > [ASCII] HW
  */
@@ -9,6 +9,17 @@
 const Subleq = require("./subleq");
 const StateMaker = require("./state");
 const utils = require("./utils");
+
+function printAscii(mTree, asciiSlots) {
+  if (asciiSlots.length == 0) {
+    return;
+  }
+  const asciiList = [];
+  asciiSlots.forEach((slot) => {
+    asciiList.push(String.fromCharCode(mTree._layers[0][slot].toJSNumber()));
+  });
+  console.log("[ASCII]", asciiList.join(""));
+}
 
 function run(memory0, nSteps, memorySlotSize, asciiSlots) {
   pc0 = 0;
@@ -33,8 +44,9 @@ function run(memory0, nSteps, memorySlotSize, asciiSlots) {
 
   const subleq = new Subleq(memorySlotSize);
   for (let ss = 0; ss < nSteps; ss++) {
-    if (ss % 5 == 0) {
+    if (ss % 3 == 0) {
       console.log("step", ss);
+      printAscii(mTree, asciiSlots);
     }
     subleq.step(sTree, mTree);
   }
@@ -45,14 +57,7 @@ function run(memory0, nSteps, memorySlotSize, asciiSlots) {
   console.log("final memory:", mTree._layers[0]);
   console.log("");
 
-  if (asciiSlots.length == 0) {
-    return;
-  }
-  const asciiList = [];
-  asciiSlots.forEach((slot) => {
-    asciiList.push(String.fromCharCode(mTree._layers[0][slot].toJSNumber()));
-  });
-  console.log("[ASCII]", asciiList.join(""));
+  printAscii(mTree, asciiSlots);
 }
 
 function main() {

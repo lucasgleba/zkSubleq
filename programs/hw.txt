@@ -1,3 +1,5 @@
+// Copies the ASCII values for "HW" from one slice of memory to another
+// then enters an infinite loop.
 // CODE
 29,31,1,
 31,27,2,
