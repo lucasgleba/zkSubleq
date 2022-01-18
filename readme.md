@@ -12,14 +12,14 @@ There is only one instruction, so no opcodes are needed. Other than the program 
 
 ## How does it work?
 
-In order to make zk-SNARKs possible, the state of the machine is Merkleized; only the memory slots involved in a given step are passed as input signals. For VMs with a large memory, passing the entire state would be impractical. The same applies to running the machine on-chain.
+To make zk-SNARKs practical, the state of the machine is Merkleized; only the memory slots involved in a given step are passed as input signals.
 
 ![zkSubleq Merkleization graph](zkSubleq_merkle.jpg)
 
 ```circom
 // Circuit for one VM step I/O
 
-// INPUT
+// **** INPUT ****
 signal input pcIn; // Program counter value
 signal input aAddr; // A operand (address)
 signal input bAddr; // B operand (address)
@@ -35,23 +35,39 @@ signal input cInPathElements[mLevels]; // cIn -> mRoot
 signal input aInPathElements[mLevels]; // AIn -> mRoot
 signal input bInPathElements[mLevels]; // bIn/bOut -> mRoot
 
-// OUTPUT
+// **** OUTPUT ****
 // Values after step execution
 signal output pcOut; // Program counter value
 signal output mRoot1; // Memory subtree root
 signal output sRoot1; // State tree root
 ```
 
+```
+MEMORY
++-----------+---+-------+-------+-----+---+-------+---+-------+---+
+| Address:  | … |  I+0  |  I+1  | I+2 | … | aAddr | … | bAddr | … |
++-----------+---+-------+-------+-----+---+-------+---+-------+---+
+| Value:    | … | aAddr | bAddr | cIn | … |  aIn  | … |  bIn  | … |
++-----------+---+-------+-------+-----+---+-------+---+-------+---+
+                [_____________________]
+                      instruction
+(I=PC*3)
+```
+
 ## Why does it suck?
 
 **Instruction set too simple**
 
-Turing-complete, yes. But using this for real-life programs would be super slow. Given that most of the constrains in the circuit come from validating Merkle proofs, a more sophisticated instruction set would not cost much and would speed things up a lot. It would be good to make it easily transpilable/compilable from a popular ISA/intermediate representation.
+Turing-complete, yes. But using this for real-life programs would be super slow. Given that most of the constraints in the circuit come from validating Merkle proofs, a more sophisticated instruction set would not cost much and would speed things up a lot. It would be good to make it easily transpilable/compilable from a popular ISA/intermediate representation.
 
 **One memory slot per signal**
 
-Every leaf node in the state tree corresponds to a register or memory slot so values can go as high as circom integers (2^253+), as opposed to conventional computers limited to 8-bit memory slots. It would be better to pack multiple smaller registers/slots into a single value to make the state tree (especially the memory subtree) more shallow.
+Every leaf node in the state tree corresponds to a register or memory slot so values can go as high as circom integers (2^253+), as opposed to conventional computers limited to 8-bit memory slots. It would be better to pack multiple smaller registers/slots into a single value to make the state tree more shallow.
 
 **Two many long Merkle proofs to validate**
 
-The circuit validates 6 long Merkle proofs (memory slot -> memory root): aAddr, bAddr, cIn, aIn, bIn, bOut. A better machine would have a load-store architecture where most of the operations happen between registers (which would be in a much smaller subtree) and at most one memory slot is read from or written to every step (other than the instruction). This would lower the number of constrains _very_ significantly and would make the VM more compatible with existing RISC ISAs.
+The circuit validates 6 long Merkle proofs (memory slot -> memory root): aAddr, bAddr, cIn, aIn, bIn, bOut. A better machine would have a load-store architecture where most of the operations happen between registers (which would be in a much smaller subtree) and at most one memory slot is read from or written to every step (other than the instruction). This would lower the number of constraints _very_ significantly and would make the VM more compatible with existing RISC ISAs.
+
+## Next steps
+
+I'm making a VM implementing the improvements mentioned above based on a risc-v instruction set. I expect to be able to run transpiled real-world software for less than 75k constrains/step.
