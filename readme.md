@@ -5,14 +5,14 @@ A VM based on the [Subleq one-instruction set computer](https://esolangs.org/wik
 **Subleq?**
 
 Given three operands A, B, C
-- _sub_: Set `Memory\[B\] -= Memory\[A\]`.
+- _sub_: Set `Memory[B] -= Memory[A]`.
 - _leq_: If the new value is less than or equal to 0, set `ProgramCounter = C`. Otherwise `ProgramCounter += 1`.
 
 There is only one instruction, so no opcodes are needed. Other than the program counter (aka instruction pointer), there are no registers.
 
 ## How does it work?
 
-In order to make zk-SNARKs possible, the state of the machine is Merkleized; only the memory slots involved in a given steps are passed as input. For VMs with a large memory, passing the entire state would be impractical. The same applies to running the machine on-chain.
+In order to make zk-SNARKs possible, the state of the machine is Merkleized; only the memory slots involved in a given step are passed as input signals. For VMs with a large memory, passing the entire state would be impractical. The same applies to running the machine on-chain.
 
 ![zkSubleq Merkleization graph](zkSubleq_merkle.jpg)
 
@@ -46,7 +46,7 @@ signal output sRoot1; // State tree root
 
 **Instruction set too simple**
 
-Turing-complete, yes. But using this for real-life programs would be super slow. Most of the constrains in the circuit will come from validating Merkle proofs. A more sophisticated instruction set would not cost much and would speed things up a lot. It would be good to make it easily transpilable/compilable from a popular ISA/intermediate representation.
+Turing-complete, yes. But using this for real-life programs would be super slow. Given that most of the constrains in the circuit come from validating Merkle proofs, a more sophisticated instruction set would not cost much and would speed things up a lot. It would be good to make it easily transpilable/compilable from a popular ISA/intermediate representation.
 
 **One memory slot per signal**
 
@@ -54,4 +54,4 @@ Every leaf node in the state tree corresponds to a register or memory slot so va
 
 **Two many long Merkle proofs to validate**
 
-The circuit validates 6 long merkle proofs (memory slot -> memory root): aAddr, bAddr, cIn, aIn, bIn, bOut. A better machine would have a load-store architecture where most of the operations happen between registers (which would be in a much smaller subtree) and at most one memory slot is read or written every step (other than the instruction). This would lower the number of constrains _very_ significantly and would make VM more compatible with existing RISC ISAs.
+The circuit validates 6 long Merkle proofs (memory slot -> memory root): aAddr, bAddr, cIn, aIn, bIn, bOut. A better machine would have a load-store architecture where most of the operations happen between registers (which would be in a much smaller subtree) and at most one memory slot is read from or written to every step (other than the instruction). This would lower the number of constrains _very_ significantly and would make the VM more compatible with existing RISC ISAs.
