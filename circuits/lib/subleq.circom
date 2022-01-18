@@ -6,7 +6,7 @@ include "../../node_modules/circomlib/circuits/mux1.circom";
 
 template Subleq(valueSize) {
 
-    // assert(n <= 252);
+    // assert(valueSize <= 252);
 
     signal input pcIn;
     signal input aIn;

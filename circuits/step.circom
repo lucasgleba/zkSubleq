@@ -4,38 +4,33 @@ include "./lib/subleq.circom";
 include "./lib/merkleTree.circom";
 include "../node_modules/circomlib/circuits/bitify.circom";
 
-// mLevels: 3, mSlotSize: 32
-// Merkle checking memory: 26479 constrains (99.9%)
-// Checking subleq: 37 constrains (0.136%)
-
 template Step(mLevels, mSlotSize) {
     // ******** INPUT ********
     // Internals: pc, instruction, operands
-    // Decimal sum x2, then bitify x2 OR bitify x1, then binary sum x2 [?]
-    // 2 dec sum, 3 bitify VS. 2 bin sum, 1 bitify
-    signal input pcIn; // ok
-    signal input aAddr; // ok
-    signal input bAddr; // ok
-    signal input cIn; // ok
-    signal input aIn; // ok
-    signal input bIn; // ok
+    signal input pcIn;
+    signal input aAddr;
+    signal input bAddr;
+    signal input cIn;
+    signal input aIn;
+    signal input bIn;
     // Externals: merkle proofs and roots
-    signal input mRoot0; // ok
-    signal input sRoot0; // ok
-    signal input aAddrPathElements[mLevels]; // ok
-    signal input bAddrPathElements[mLevels]; // ok
-    signal input cPathElements[mLevels]; // ok
-    signal input aInPathElements[mLevels]; // ok
-    signal input bInPathElements[mLevels]; // ok
+    signal input mRoot0;
+    signal input sRoot0;
+    signal input aAddrPathElements[mLevels];
+    signal input bAddrPathElements[mLevels];
+    signal input cInPathElements[mLevels];
+    signal input aInPathElements[mLevels];
+    signal input bInPathElements[mLevels];
 
     // ******** OUTPUT ********
     // Internals
     signal output pcOut;
     // signal output bOut;
-    signal bOut;
     // Externals
     signal output mRoot1;
     signal output sRoot1;
+
+    signal bOut;
 
     // ******** EXECUTE STEP ********
     // Bitify bAddr
@@ -117,7 +112,7 @@ template Step(mLevels, mSlotSize) {
         bAddrMerkleChecker.pathIndices[ii] <== bInsAddrBitifier.out[ii];
         bAddrMerkleChecker.pathElements[ii] <== bAddrPathElements[ii];
         cInMerkleChecker.pathIndices[ii] <== cInsAddrBitifier.out[ii];
-        cInMerkleChecker.pathElements[ii] <== cPathElements[ii];
+        cInMerkleChecker.pathElements[ii] <== cInPathElements[ii];
         // Set proof[ii] for aIn, bIn
         aInMerkleChecker.pathIndices[ii] <== aAddrBitifier.out[ii];
         aInMerkleChecker.pathElements[ii] <== aInPathElements[ii];
@@ -140,14 +135,14 @@ template ValidStep(mLevels, mSlotSize) {
     signal input sRoot0; // public
     signal input aAddrPathElements[mLevels];
     signal input bAddrPathElements[mLevels];
-    signal input cPathElements[mLevels];
+    signal input cInPathElements[mLevels];
     signal input aInPathElements[mLevels];
     signal input bInPathElements[mLevels];
 
     // ******** State 1 ********
     // Internals
-    // signal input pcOut; // ok
-    // signal input bOut; // ok
+    // signal input pcOut;
+    // signal input bOut;
     // Externals
     // signal input mRoot1;
     signal input sRoot1; // public
@@ -167,7 +162,7 @@ template ValidStep(mLevels, mSlotSize) {
     for (var ii = 0; ii < mLevels; ii++) {
         step.aAddrPathElements[ii] <== aAddrPathElements[ii];
         step.bAddrPathElements[ii] <== bAddrPathElements[ii];
-        step.cPathElements[ii] <== cPathElements[ii];
+        step.cInPathElements[ii] <== cInPathElements[ii];
         step.aInPathElements[ii] <== aInPathElements[ii];
         step.bInPathElements[ii] <== bInPathElements[ii];
     }

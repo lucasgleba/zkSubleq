@@ -97,7 +97,7 @@ function formatSample(data) {
       sRoot0: data.startState.root,
       aAddrPathElements: data.startState.A.addrPath.pathElements,
       bAddrPathElements: data.startState.B.addrPath.pathElements,
-      cPathElements: data.startState.C.posPath.pathElements,
+      cInPathElements: data.startState.C.posPath.pathElements,
       aInPathElements: data.startState.A.mPath.pathElements,
       bInPathElements: data.startState.B.mPath.pathElements,
       sRoot1: data.endState.root,
@@ -130,7 +130,7 @@ function formatMultiStepSample(stepsData) {
     bIn: [],
     aAddrPathElements: [],
     bAddrPathElements: [],
-    cPathElements: [],
+    cInPathElements: [],
     aInPathElements: [],
     bInPathElements: [],
   };
@@ -143,7 +143,7 @@ function formatMultiStepSample(stepsData) {
     inputData.bIn.push(stepData.bIn);
     inputData.aAddrPathElements.push(stepData.aAddrPathElements);
     inputData.bAddrPathElements.push(stepData.bAddrPathElements);
-    inputData.cPathElements.push(stepData.cPathElements);
+    inputData.cInPathElements.push(stepData.cInPathElements);
     inputData.aInPathElements.push(stepData.aInPathElements);
     inputData.bInPathElements.push(stepData.bInPathElements);
   });

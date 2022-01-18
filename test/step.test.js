@@ -1,3 +1,5 @@
+// JS tests don't generate keys or proofs, they just check the witness
+// For real proofs, go to ../circuits/
 // Checks Step and ValidStep circuits against pseudo-random (seeded) inputs
 
 // TODO: Test for failure if input is not valid

@@ -16,7 +16,7 @@ template MultiStep(nSteps, mLevels, mSlotSize) {
     signal input sRoot0;
     signal input aAddrPathElements[nSteps][mLevels];
     signal input bAddrPathElements[nSteps][mLevels];
-    signal input cPathElements[nSteps][mLevels];
+    signal input cInPathElements[nSteps][mLevels];
     signal input aInPathElements[nSteps][mLevels];
     signal input bInPathElements[nSteps][mLevels];
 
@@ -45,7 +45,7 @@ template MultiStep(nSteps, mLevels, mSlotSize) {
     for (var ii = 0; ii < mLevels; ii++) {
         steps[0].aAddrPathElements[ii] <== aAddrPathElements[0][ii];
         steps[0].bAddrPathElements[ii] <== bAddrPathElements[0][ii];
-        steps[0].cPathElements[ii] <== cPathElements[0][ii];
+        steps[0].cInPathElements[ii] <== cInPathElements[0][ii];
         steps[0].aInPathElements[ii] <== aInPathElements[0][ii];
         steps[0].bInPathElements[ii] <== bInPathElements[0][ii];
     }
@@ -66,7 +66,7 @@ template MultiStep(nSteps, mLevels, mSlotSize) {
         for (var jj = 0; jj < mLevels; jj++) {
             steps[ii].aAddrPathElements[jj] <== aAddrPathElements[ii][jj];
             steps[ii].bAddrPathElements[jj] <== bAddrPathElements[ii][jj];
-            steps[ii].cPathElements[jj] <== cPathElements[ii][jj];
+            steps[ii].cInPathElements[jj] <== cInPathElements[ii][jj];
             steps[ii].aInPathElements[jj] <== aInPathElements[ii][jj];
             steps[ii].bInPathElements[jj] <== bInPathElements[ii][jj];
         }
@@ -93,7 +93,7 @@ template ValidMultiStep(nSteps, mLevels, mSlotSize) {
     signal input sRoot0;
     signal input aAddrPathElements[nSteps][mLevels];
     signal input bAddrPathElements[nSteps][mLevels];
-    signal input cPathElements[nSteps][mLevels];
+    signal input cInPathElements[nSteps][mLevels];
     signal input aInPathElements[nSteps][mLevels];
     signal input bInPathElements[nSteps][mLevels];
 
@@ -122,7 +122,7 @@ template ValidMultiStep(nSteps, mLevels, mSlotSize) {
         for (var jj = 0; jj < mLevels; jj++) {
             multiStep.aAddrPathElements[ii][jj] <== aAddrPathElements[ii][jj];
             multiStep.bAddrPathElements[ii][jj] <== bAddrPathElements[ii][jj];
-            multiStep.cPathElements[ii][jj] <== cPathElements[ii][jj];
+            multiStep.cInPathElements[ii][jj] <== cInPathElements[ii][jj];
             multiStep.aInPathElements[ii][jj] <== aInPathElements[ii][jj];
             multiStep.bInPathElements[ii][jj] <== bInPathElements[ii][jj];
         }

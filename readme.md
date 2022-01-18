@@ -1,38 +1,57 @@
-Program counter points to instruction (3 memory addresses).
-i.e., First operand address is 3 * PC.
+# zkSubleq
 
-PC could point to memory address directly. What would the advantage be?
+A VM based on the [Subleq one-instruction set computer](https://esolangs.org/wiki/Subleq) implemented in JS and circom.
 
-Notes:
-- Took about 30 min to generate pTau17
-- Takes about 10s to generate step_13_32 proof (in js)
-- MultiStep steps=2 md=13 (8k+ slots) ss=128 | proof took 21s
-    - md=13 seems to take 10-12s per step
-- 256949 constrains (just under 2**18) for step md=32, ss=128
+**Subleq?**
 
-valueSize vs subleq #constrains
-- 32: 37
-- 64: 69
-- 128: 133
-- 5 + valueSize
+Given three operands A, B, C
+- _sub_: Set `Memory\[B\] -= Memory\[A\]`.
+- _leq_: If the new value is less than or equal to 0, set `ProgramCounter = C`. Otherwise `ProgramCounter += 1`.
 
-Jan 13
+There is only one instruction, so no opcodes are needed. Other than the program counter (aka instruction pointer), there are no registers.
 
-- MiMCSponge(2, 220, 1) has 1320 constrains
-- Merkle tree checker levels=32 has 42336 constrains, 1323
-- Merkle tree checker levels=34 has 44982 constrains, 1323
-- So for current step (6 long merkle proofs per cycle) n constrains =
-6 * 1323 * md + some change
+## How does it work?
 
+In order to make zk-SNARKs possible, the state of the machine is Merkleized; only the memory slots involved in a given steps are passed as input. For VMs with a large memory, passing the entire state would be impractical. The same applies to running the machine on-chain.
 
-If doing 2 long merkle proofs per cycle would be:
-2 * 1323 * md + some change
-for md = 32, constrains a bit over 84672 (2**16.36...)
-for md = 24, constrains a bit over 63504 (2**15.95...) # might just not fit when adding change
-for md = 16, constrains a bit over 42336 (2**15.36...)
+![zkSubleq Merkleization graph](zkSubleq_merkle.jpg)
 
-If doing 4 long merkle proofs per cycle would be:
-4 * 1323 * md + some change
-for md = 32, constrains a bit over 169344 (2**17.36...)
-for md = 24, constrains a bit over 127008 (2**16.95...) # might just not fit when adding change
-for md = 16, constrains a bit over 84672 (2**16.36...)
+```circom
+// Circuit for one VM step I/O
+
+// INPUT
+signal input pcIn; // Program counter value
+signal input aAddr; // A operand (address)
+signal input bAddr; // B operand (address)
+signal input cIn; // C operand (instruction index)
+signal input aIn; // Memory[A]
+signal input bIn; // Memory[B]
+signal input mRoot0; // Memory subtree root
+signal input sRoot0; // State tree root
+// Merkle proof elements (paths are derived in the circuit)
+signal input aAddrPathElements[mLevels]; // aAddr -> mRoot
+signal input bAddrPathElements[mLevels]; // bAddr -> mRoot
+signal input cInPathElements[mLevels]; // cIn -> mRoot
+signal input aInPathElements[mLevels]; // AIn -> mRoot
+signal input bInPathElements[mLevels]; // bIn/bOut -> mRoot
+
+// OUTPUT
+// Values after step execution
+signal output pcOut; // Program counter value
+signal output mRoot1; // Memory subtree root
+signal output sRoot1; // State tree root
+```
+
+## Why does it suck?
+
+**Instruction set too simple**
+
+Turing-complete, yes. But using this for real-life programs would be super slow. Most of the constrains in the circuit will come from validating Merkle proofs. A more sophisticated instruction set would not cost much and would speed things up a lot. It would be good to make it easily transpilable/compilable from a popular ISA/intermediate representation.
+
+**One memory slot per signal**
+
+Every leaf node in the state tree corresponds to a register or memory slot so values can go as high as circom integers (2^253+), as opposed to conventional computers limited to 8-bit memory slots. It would be better to pack multiple smaller registers/slots into a single value to make the state tree (especially the memory subtree) more shallow.
+
+**Two many long Merkle proofs to validate**
+
+The circuit validates 6 long merkle proofs (memory slot -> memory root): aAddr, bAddr, cIn, aIn, bIn, bOut. A better machine would have a load-store architecture where most of the operations happen between registers (which would be in a much smaller subtree) and at most one memory slot is read or written every step (other than the instruction). This would lower the number of constrains _very_ significantly and would make VM more compatible with existing RISC ISAs.
