@@ -1,4 +1,9 @@
 #!/bin/bash
+# use like run_test.sh
+# expects expects ptau file for value in ptau.txt to be in build folder
+# e.g., circuits/test/step/build/pot15_final.ptau
+# https://github.com/iden3/snarkjs#7-prepare-phase-2
+# expected to be run from /circuits
 
 set -e
 trap 'catch $?' ERR
@@ -8,11 +13,12 @@ catch() {
 }
 
 main() {
+    mkdir ./test/$1/build/ 2> /dev/null || echo
     cd ./test/$1/build/
 
     n_ptau=$(<../ptau.txt)
-    ptau0_fn="pot${n_ptau}_0000.ptau"
-    ptau1_fn="pot${n_ptau}_0001.ptau"
+    # ptau0_fn="pot${n_ptau}_0000.ptau"
+    # ptau1_fn="pot${n_ptau}_0001.ptau"
     ptauf_fn="pot${n_ptau}_final.ptau"
 
     echo "compiling circuit to r1cs..."
@@ -22,10 +28,10 @@ main() {
     snarkjs r1cs info circuit.r1cs
     echo
 
-    echo "calculating witness..."
-    date
-    node ./circuit_js/generate_witness.js ./circuit_js/circuit.wasm ../input.json witness.wtns
-    echo
+    # echo "calculating witness..."
+    # date
+    # node ./circuit_js/generate_witness.js ./circuit_js/circuit.wasm ../input.json witness.wtns
+    # echo
 
     echo "running powers of tau ceremony..."
     # https://docs.circom.io/getting-started/proving-circuits/#powers-of-tau
@@ -55,42 +61,6 @@ main() {
     # snarkjs zkey verify circuit.r1cs $ptauf_fn circuit_0001.zkey
     snarkjs zkey export verificationkey circuit_0001.zkey verification_key.json
     echo
-
-    echo "generating proof..."
-    date
-    snarkjs groth16 prove circuit_0001.zkey witness.wtns proof.json public.json
-    echo
-
-    echo "verifying proof..."
-    date
-    snarkjs groth16 verify verification_key.json public.json proof.json
-    if cmp --silent ../expected.json public.json
-    then
-        echo "proof OK"
-    else 
-        echo "ERROR: result does not match expected"
-        echo "expected:"
-        cat ../expected.json
-        echo ""
-        echo "found"
-        cat public.json
-        echo ""
-        exit 1
-    fi
-    echo
-
-    # echo "clearing files"
-    # date
-    # rm circuit.r1cs
-    # rm circuit.wasm
-    # rm circuit.sym
-    # rm circuit_init.zkey
-    # rm circuit.zkey
-    # rm verification_key.json
-    # rm verifier.sol
-    # rm proof.json
-    # rm public.json
-    # rm witness.wtns
 
     echo "done!"
     date

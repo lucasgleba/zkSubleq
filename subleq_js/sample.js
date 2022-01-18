@@ -1,3 +1,10 @@
+/**
+ * generates and formats sample data
+ * use:
+ * node subleq_js.js single <outputPath> <seed> <memoryDepth> <memorySlotSize>
+ * node subleq_js.js multi <outputPath> <programPath> <nSteps> <memoryDepth> <memorySlotSize>
+ */
+
 const Subleq = require("./subleq");
 const StateMaker = require("./state");
 const utils = require("./utils");
@@ -156,7 +163,7 @@ function main() {
   const filepath = process.argv[3];
   const mode = process.argv[2];
   if (mode == "single") {
-    const [seed, memorySlotSize, memoryDepth] = process.argv.slice(4, 7);
+    const [seed, memoryDepth, memorySlotSize] = process.argv.slice(4, 7);
     const data = genSample(seed, memorySlotSize, memoryDepth);
     formattedData = formatSample(data).input;
   } else if (mode == "multi") {
@@ -165,8 +172,8 @@ function main() {
     const data = genMultiStepSample(
       programPath,
       nSteps,
-      memorySlotSize,
-      memoryDepth
+      memoryDepth,
+      memorySlotSize
     );
     formattedData = formatMultiStepSample(data).input;
   } else if (mode == "help") {

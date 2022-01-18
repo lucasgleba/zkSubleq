@@ -1,3 +1,8 @@
+/**
+ * VM in js
+ * also used for testing and generating sample data
+ */
+
 const { bigInt } = require("snarkjs");
 const stringifyBigInts =
   require("websnark/tools/stringifybigint").stringifyBigInts;

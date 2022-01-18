@@ -1,3 +1,5 @@
+// Checks Subleq circuit against all size 4 permutations with repetition of {1, 2, 3}
+
 // TODO: Uninstall if not needed
 // const chai = require("chai");
 // const F1Field = require("ffjavascript").F1Field;
@@ -13,7 +15,7 @@
 const { getWasmTester } = require("./utils");
 const { subleq } = require("../subleq_js/subleq");
 
-const TEST_INPUT_VALUE_RANGE = [0, 1, 2];
+const TEST_INPUT_VALUE_SET = [0, 1, 2];
 
 async function checkSubleq(pcIn, aIn, bIn, cIn, circuit) {
   const input = { pcIn, aIn, bIn, cIn };
@@ -26,10 +28,10 @@ describe("subleq circuit", function () {
   this.timeout(100000);
   it("subleq_128", async () => {
     let circuit = await getWasmTester("lib", "subleq_128.circom");
-    await TEST_INPUT_VALUE_RANGE.forEach(async (pcIn) => {
-      await TEST_INPUT_VALUE_RANGE.forEach(async (aIn) => {
-        await TEST_INPUT_VALUE_RANGE.forEach(async (bIn) => {
-          await TEST_INPUT_VALUE_RANGE.forEach(async (cIn) => {
+    await TEST_INPUT_VALUE_SET.forEach(async (pcIn) => {
+      await TEST_INPUT_VALUE_SET.forEach(async (aIn) => {
+        await TEST_INPUT_VALUE_SET.forEach(async (bIn) => {
+          await TEST_INPUT_VALUE_SET.forEach(async (cIn) => {
             await checkSubleq(pcIn, aIn, bIn, cIn, circuit);
           });
         });

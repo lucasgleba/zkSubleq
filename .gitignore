@@ -6,3 +6,4 @@ circuits/test/**/build
 circuits/test/**/history
 *.ptau
 circuits/test/ptau
+circuits/metrics

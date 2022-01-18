@@ -1,3 +1,11 @@
+/**
+ * runs the vm in js
+ * use: node run.js <filepath> <nSteps> <memorySlotSize> <asciiSlots>
+ * > node subleq_js/run.js programs/hw.txt 8 32 27,28
+ * ...
+ * > [ASCII] HW
+ */
+
 const Subleq = require("./subleq");
 const StateMaker = require("./state");
 const utils = require("./utils");
@@ -34,7 +42,7 @@ function run(memory0, nSteps, memorySlotSize, asciiSlots) {
   console.log("");
   console.log("DONE!");
   console.log("");
-  console.log(mTree._layers[0]);
+  console.log("final memory:", mTree._layers[0]);
   console.log("");
 
   if (asciiSlots.length == 0) {

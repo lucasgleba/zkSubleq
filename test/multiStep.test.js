@@ -1,3 +1,6 @@
+// Checks MultiStep circuit against 8-step "Hello World" circuit
+// Checks ValidMultiStep against pseudo-random (seeded) input
+
 const path = require("path");
 const { getWasmTester } = require("./utils");
 const sample = require("../subleq_js/sample.js");
@@ -13,7 +16,17 @@ async function checkValidStep(data, circuit) {
 
 describe("multi step circuit", function () {
   this.timeout(100000);
-  it("validMultiStep_1_3_128", async () => {
+  it("multistep io", async () => {
+    const programPath = path.join(process.cwd(), "programs", "hw.txt");
+    const stepsData = sample.genMultiStepSample(programPath, 8, 128, 5);
+    const data = sample.formatMultiStepSample(stepsData);
+    const inputData = Object.assign({}, data.input);
+    delete inputData.sRoot1;
+    let circuit = await getWasmTester("multi_step", "multiStep_8_5_128.circom");
+    const w = await circuit.calculateWitness(inputData, true);
+    await circuit.assertOut(w, data.internalOutput);
+  });
+  it("valid multistep constrain", async () => {
     let circuit = await getWasmTester(
       "multi_step",
       "validMultiStep_1_3_128.circom"
@@ -23,16 +36,5 @@ describe("multi step circuit", function () {
       data = sample.formatSample(sample.genSample(ii, 128, 3));
       await checkValidStep(data, circuit);
     }
-  });
-  it("multiStep_8_5_128", async () => {
-    // path, nSteps, maxMemoryDepth
-    const programPath = path.join(process.cwd(), "programs", "hw.txt");
-    const stepsData = sample.genMultiStepSample(programPath, 8, 128, 5);
-    const data = sample.formatMultiStepSample(stepsData);
-    const inputData = Object.assign({}, data.input);
-    delete inputData.sRoot1;
-    let circuit = await getWasmTester("multi_step", "multiStep_8_5_128.circom");
-    const w = await circuit.calculateWitness(inputData, true);
-    await circuit.assertOut(w, data.internalOutput);
   });
 });
