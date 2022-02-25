@@ -84,3 +84,11 @@ I'm making a VM implementing the improvements mentioned above based on a risc-v 
 Update: I implemented a Risc-V CPU in circom. I can generate a somewhat efficient zk-Proof for a slice of execution of minimally transpiled rv32i binary. Coming soon to a Github near you!
 
 Ping me on [twitter](https://twitter.com/lucasgleba) if you want to learn more.
+
+## See also
+
+One can use more sophisticated zero-knowledge math to make a much more efficient (but complex) zkVM. Most of the efforts in this front are being made by teams working on EVM-compatible zero-knowledge rollups.
+
+- [Polygon Hermez](https://blog.hermez.io/zkevm-documentation/)
+- [Starkware's Cairo](https://www.cairo-lang.org/hello-cairo/)
+- [zkSync's zkEVM](https://docs.zksync.io/zkevm)
