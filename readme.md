@@ -1,6 +1,15 @@
 # zkSubleq
 
-A VM based on the [Subleq one-instruction set computer](https://esolangs.org/wiki/Subleq) implemented in JS and circom.
+A VM based on the (turing-complete!) [Subleq one-instruction set computer](https://esolangs.org/wiki/Subleq) implemented in JS and circom.
+
+```
+git clone https://github.com/lucasgleba/zkSubleq.git
+cd zkSubleq
+npm install
+npx mocha # might take 30+ seconds
+```
+
+You will need [circom](https://github.com/iden3/circom) and [snarkjs](https://github.com/iden3/snarkjs) to compile circuits and generate proofs. Check out the [circom introduction](https://docs.circom.io/getting-started/installation/).
 
 **Subleq?**
 
@@ -54,7 +63,7 @@ MEMORY
 (I=PC*3)
 ```
 
-## Why does it suck?
+## Problems
 
 **Instruction set too simple**
 
@@ -62,12 +71,16 @@ Turing-complete, yes. But using this for real-life programs would be super slow.
 
 **One memory slot per signal**
 
-Every leaf node in the state tree corresponds to a register or memory slot so values can go as high as circom integers (2^253+), as opposed to conventional computers limited to 8-bit memory slots. It would be better to pack multiple smaller registers/slots into a single value to make the state tree more shallow.
+Every leaf node in the state tree corresponds to a register or memory slot so values can go as high as circom integers (2^253+), as opposed to conventional computers limited to 8-bit memory slots. It would be better to pack multiple smaller registers/slots into a single value to make the state tree more shallow. e.g., one instruction should correspond to one signal, not three.
 
 **Two many long Merkle proofs to validate**
 
-The circuit validates 6 long Merkle proofs (memory slot -> memory root): aAddr, bAddr, cIn, aIn, bIn, bOut. A better machine would have a load-store architecture where most of the operations happen between registers (which would be in a much smaller subtree) and at most one memory slot is read from or written to every step (other than the instruction). This would lower the number of constraints _very_ significantly and would make the VM more compatible with existing RISC ISAs.
+The circuit validates 6 long Merkle proofs (memory slot -> memory root): aAddr, bAddr, cIn, aIn, bIn, bOut. A better machine would have a load-store architecture where most of the operations happen between registers (which would be in a much smaller subtree) and at most one memory slot is read from or written to every step (other than the instruction).
 
 ## Next steps
 
 I'm making a VM implementing the improvements mentioned above based on a risc-v instruction set. I expect to be able to run transpiled real-world software for less than 75k constrains/step.
+
+Update: I implemented a Risc-V CPU in circom. I can generate a somewhat efficient zk-Proof for a slice of execution of minimally transpiled rv32i binary. Coming soon to a Github near you!
+
+Ping me on [twitter](https://twitter.com/lucasgleba) if you want to learn more.
