@@ -81,7 +81,7 @@ The circuit validates 6 long Merkle proofs (memory slot -> memory root): aAddr, 
 
 I'm making a VM implementing the improvements mentioned above based on a risc-v instruction set. I expect to be able to run transpiled real-world software for less than 75k constrains/step.
 
-Update: I implemented a Risc-V CPU in circom. I can generate a somewhat efficient zk-Proof for a slice of execution of minimally transpiled rv32i binary. Coming soon to a Github near you!
+Update: I implemented a [Risc-V CPU in circom](https://github.com/lucasgleba/zkRiscV). I can generate a somewhat efficient zk-Proof for a slice of execution of minimally transpiled rv32i binary.
 
 Ping me on [twitter](https://twitter.com/lucasgleba) if you want to learn more.
 
